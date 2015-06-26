@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="32" tileheight="32" nextobjectid="77">
+ <layer name="Tile Layer 1" width="50" height="25">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20KP6AAAAAAgLcBE4gAAQ==
+  </data>
+ </layer>
+ <objectgroup name="box2d">
+  <object id="62" name="levelBorder" type="object" x="40.8572" y="75.5198">
+   <properties>
+    <property name="categoryBits" value="0000000000000100"/>
+   </properties>
+   <polyline points="0,0 94.7143,214.171 -21.8572,394.389 142.072,564.16 211.285,710.422 652.071,681.692 797.787,551.099 1041.86,731.317 1449.86,679.08 1559.14,444.014 1530,172.382 1428,-44.4014 1125.64,-65.2962 965.357,172.382 1056.43,459.686 728.571,329.093 520.928,519.758 375.215,208.948 746.787,26.1185 280.501,-70.5198 0,5.22369"/>
+  </object>
+ </objectgroup>
+</map>
