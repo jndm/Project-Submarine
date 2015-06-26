@@ -15,7 +15,7 @@ public class BulletPool extends Pool<Bullet>{
 	
 	@Override
 	protected Bullet newObject() {
-		System.out.println("New bullet created");
+		//System.out.println("New bullet created");
 		return new Bullet(world, 0, 0);
 	}
 

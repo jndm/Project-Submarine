@@ -94,26 +94,25 @@ public class Player {
 
 	public void render(SpriteBatch sb, float delta) {
 		sb.begin();
-			if(takeDamage) {
-				takeDamageAnimation.update();
-				takeDamageAnimation.draw(sb);
-				if(takeDamageAnimation.isAnimationFinished()) {
-					takeDamage = false;
-					takeDamageAnimation.setTime(0);
-				}
-			} else {
-				sprite.draw(sb);
+		if(takeDamage) {
+			takeDamageAnimation.update();
+			takeDamageAnimation.draw(sb);
+			if(takeDamageAnimation.isAnimationFinished()) {
+				takeDamage = false;
+				takeDamageAnimation.setTime(0);
 			}
-			
-			for(PooledEffect effect : effects) {
-				effect.draw(sb, delta);
-				if(effect.isComplete()) {
-					effects.removeValue(effect, true);
-					effect.free();
-				}
-			}
-		sb.end();
+		} else {
+			sprite.draw(sb);
+		}
 		
+		for(PooledEffect effect : effects) {
+			effect.draw(sb, delta);
+			if(effect.isComplete()) {
+				effects.removeValue(effect, true);
+				effect.free();
+			}
+		}
+		sb.end();
 		//Gdx.app.log("pool stats", "active: " + effects.size + " | free: " + particlePool.getFree() + "/" + particlePool.max + " | record: " + particlePool.peak);
 	}
 	

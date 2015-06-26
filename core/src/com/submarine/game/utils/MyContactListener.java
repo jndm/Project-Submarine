@@ -37,16 +37,20 @@ public class MyContactListener implements ContactListener{
 		
 		//Bullet handling
 		if(fa.getUserData() != null && fa.getUserData() instanceof Bullet) { //If fixture a = bullet and fb = wall
-			Bullet b = (Bullet) fa.getUserData();
+			Bullet b = (Bullet) fb.getUserData();
 			b.addRicochetCount();
-			b.addCollisionPoint(new Vector2(b.getBody().getWorldCenter()));
+			Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
+			b.addCollisionPoint(collisionPoint);
+			play.addPointLight(collisionPoint);
 			if(b.shouldBeRemoved()) {
 				play.addBulletToBeRemoved(b);
 			}
 		} else if(fb.getUserData() != null && fb.getUserData() instanceof Bullet) { //If fixture a = bullet and fb = wall
 			Bullet b = (Bullet) fb.getUserData();
 			b.addRicochetCount();
-			b.addCollisionPoint(new Vector2(b.getBody().getWorldCenter()));
+			Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
+			b.addCollisionPoint(collisionPoint);
+			play.addPointLight(collisionPoint);
 			if(b.shouldBeRemoved()) {
 				play.addBulletToBeRemoved(b);
 			}

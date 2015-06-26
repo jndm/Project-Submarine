@@ -102,7 +102,7 @@ public class Bullet implements Poolable{
 	
 	public void setShootingPoint(Vector2 sp) {
 		shootingPoint.set(sp);
-		System.out.println("Adding point shooting point: ("+shootingPoint.x+", "+shootingPoint.y+")");
+		//System.out.println("Adding point shooting point: ("+shootingPoint.x+", "+shootingPoint.y+")");
 	}
 
 	@Override

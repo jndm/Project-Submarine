@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -32,47 +33,36 @@ import com.submarine.game.utils.BulletPool;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
+import com.submarine.game.utils.PointLightPool;
 import com.submarine.resourses.Bullet;
 import com.submarine.resourses.Player;
 
 public class Play implements Screen {
-
+	
+	//Common stuff
 	private Main game;
 	private World world;
 	private Box2DDebugRenderer box2dRenderer;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Player player;
+	private float timeElapsed = 0;
 	
+	//Bullet
 	private Array<Bullet> activeBullets; 
 	private Array<Bullet> bulletsToBeRemoved;
 	private BulletPool bulletPool;
 	
+	//Bullet trail
 	private Sprite bulletTrail;
 	private ShapeRenderer shapeRenderer;
 	private Vector2 shootPos;
 		
 	private BitmapFont font = new BitmapFont();
 	
-	//TESTING remove after
-	private Texture testBg;
+	//Lighting
 	private RayHandler rayHandler;
-	private PointLight pointlight;
-	//EOF Testing
-	
-	//Shaders
-	private ShaderProgram defaultShader;
-	private ShaderProgram finalShader;
-	
-	public static final float ambientIntensity = .7f;
-	public static final Vector3 ambientColor = new Vector3(0.3f, 0.3f, 0.7f);
-	
-	final String finalPixelShader =  Gdx.files.internal("shaders/pixelShader.glsl").readString();
-	final String vertexShader = Gdx.files.internal("shaders/vertexShader.glsl").readString();
-	final String defaultPixelShader = Gdx.files.internal("shaders/defaultPixelShader.glsl").readString();
-	
-	private Texture light;
-	private FrameBuffer fbo;
-	//EOF Shaders
+	private PointLightPool pointLightPool;
+	private Array<PointLight> activeLights;	
 	
 	public Play(Main game) {
 		this.game = game;
@@ -93,55 +83,27 @@ public class Play implements Screen {
 		Box2DMapObjectParser parser = new Box2DMapObjectParser(0.03125f);
 		parser.load(world, map);
 		
-		mapRenderer = new OrthogonalTiledMapRenderer(map, parser.getUnitScale());
+		mapRenderer = new OrthogonalTiledMapRenderer(map, parser.getUnitScale(), game.sb);
 		box2dRenderer = new Box2DDebugRenderer();
 		shapeRenderer = new ShapeRenderer();
 		
-		ShaderProgram.pedantic = false;
-		defaultShader = new ShaderProgram(vertexShader, defaultPixelShader);
-		finalShader = new ShaderProgram(vertexShader, finalPixelShader);
-		
-		finalShader.begin();
-		finalShader.setUniformi("u_lightmap", 1);
-		finalShader.setUniformf("ambientColor", ambientColor.x, ambientColor.y, ambientColor.z, ambientIntensity);
-		finalShader.end();
-		
-		light = new Texture("shaders/light.png");
-		
-		/*////TESTING remove after
+		////TESTING remove after
 		//Lighting
-		RayHandler.setGammaCorrection(true);
         RayHandler.useDiffuseLight(true);
+        RayHandler.setGammaCorrection(true);
         rayHandler = new RayHandler(world);
-        rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
-        rayHandler.setCulling(true);                
+        rayHandler.setAmbientLight(0);
+        rayHandler.setCulling(false);                
         rayHandler.setBlur(true);
         rayHandler.setBlurNum(1);
         rayHandler.setShadows(true);
-   
-		pointlight = new PointLight(rayHandler, 16);
-		pointlight.setColor(1, 1, 1, 1);
-		pointlight.attachToBody(player.getBody());
-		pointlight.setDistance(2);
+        
+        pointLightPool = new PointLightPool(rayHandler);
+        activeLights = new Array<PointLight>();
 		
-		
-		Pixmap pixmap = new Pixmap( 32, 32, Format.RGBA8888 );
-		pixmap.setColor( 1f, 1f, 1f, 1f );
-		pixmap.fillRectangle(0, 0, 32, 32);
-		testBg = new Texture(pixmap);
-		*/
-		//createBulletTrail();
 		createInputProcessor();	
 	}
-	/*
-	private void createBulletTrail() {
-		Pixmap pixmap = new Pixmap( 32, 32, Format.RGBA8888 );
-		pixmap.setColor( 0.41f, 0.78f, 1f, 1f );
-		pixmap.fillRectangle(0, 0, 32, 32);
-		bulletTrail = new Sprite(new Texture(pixmap));
-		pixmap.dispose();
-	}
-	*/
+
 	private void createInputProcessor() {
 		Gdx.input.setInputProcessor(new MyInputProcessor(){
 			@Override
@@ -201,44 +163,23 @@ public class Play implements Screen {
 	@Override
 	public void render (float delta) {
 		update(delta);
-			
-		/*
-		game.sb.begin();
-		game.sb.draw(testBg, -Gdx.graphics.getWidth()/2, -Gdx.graphics.getHeight()/2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-	    game.sb.end();
-		
-		rayHandler.setCombinedMatrix(game.cam.combined);
-		rayHandler.updateAndRender();
-		*/
-		fbo.begin();
-			game.sb.setProjectionMatrix(game.cam.combined);
-			game.sb.setShader(defaultShader);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-			game.sb.begin();
-			game.sb.draw(light, 6, 22, 5, 5);
-			game.sb.end();
-		fbo.end();
-		
+
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.sb.setProjectionMatrix(game.cam.combined);
-		game.sb.setShader(finalShader);
-		fbo.getColorBufferTexture().bind(1); //this is important! bind the FBO to the 2nd texture unit
-		light.bind(0); //we force the binding of a texture on first texture unit to avoid artefacts
-					   //this is because our default and ambiant shader dont use multi texturing...
-					   //you can basically bind anything, it doesnt matter
-		
-		FrameBuffer.unbind();
-		
-		player.render(game.sb, delta);
+
 		mapRenderer.setView(game.cam);
 		mapRenderer.render();
-
 		box2dRenderer.render(world, game.cam.combined);
+		
+		rayHandler.setCombinedMatrix(game.cam.combined);
+		rayHandler.updateAndRender();
+		
+		player.render(game.sb, delta);
 		
 		//Render bullet trail
 		shapeRenderer.setProjectionMatrix(game.cam.combined);
-		shapeRenderer.setColor( 0.41f, 0.78f, 1f, 1f );
+		shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
 		shapeRenderer.begin(ShapeType.Filled);
 		for(Bullet b : activeBullets){
 			Vector2 bulletpos = b.getBody().getPosition();
@@ -270,7 +211,29 @@ public class Play implements Screen {
 		world.step(1/60f, 8, 3);
 		player.move();
 		checkIfBulletsToBeRemoved();
+		fadeOutLights(delta);
 		updateCamera();
+	}
+
+	private void fadeOutLights(float delta) {
+		if(activeLights.size != 0) {
+			timeElapsed += delta;
+			if(Constants.LIGHT_FADE_TIME <= timeElapsed) {
+				Iterator<PointLight> i = activeLights.iterator();
+				while(i.hasNext()) {
+					PointLight pl = i.next();
+					float newAlpha = pl.getColor().a - 0.01f;
+					pl.setColor(pl.getColor().r, pl.getColor().g, pl.getColor().b, newAlpha);
+					if(newAlpha <= 0) {
+						activeLights.removeValue(pl, false);
+						pointLightPool.free(pl);
+					}
+				}
+				timeElapsed -= Constants.LIGHT_FADE_TIME;
+			}
+		} else {
+			timeElapsed = 0;
+		}		
 	}
 
 	private void checkIfBulletsToBeRemoved() {
@@ -280,9 +243,10 @@ public class Play implements Screen {
 			world.destroyBody(bullet.getBody());
 			activeBullets.removeValue(bullet, false);
 			bulletPool.free(bullet);
-			System.out.println("Body destroyed");
+			//System.out.println("Body destroyed");
 		}
 		bulletsToBeRemoved.clear();
+		bulletsToBeRemoved.shrink();
 	}
 
 	private void updateCamera() {
@@ -314,12 +278,6 @@ public class Play implements Screen {
 	public void resize(int width, int height) {
 		game.cam.setToOrtho(false, width / game.PPM, height / game.PPM);
 		game.cam.update();
-		
-		fbo = new FrameBuffer(Format.RGBA8888, width, height, false);
-
-		finalShader.begin();
-		finalShader.setUniformf("resolution", width, height);
-		finalShader.end();
 	}
 
 	@Override
@@ -342,8 +300,6 @@ public class Play implements Screen {
 
 	@Override
 	public void dispose() {
-		finalShader.dispose();
-		fbo.dispose();
 		world.dispose();
 		mapRenderer.dispose();
 		box2dRenderer.dispose();
@@ -353,7 +309,13 @@ public class Play implements Screen {
 
 	public void addBulletToBeRemoved(Bullet bullet) {
 		bulletsToBeRemoved.add(bullet);
-		System.out.println("Added bullet");
+		//System.out.println("Added bullet");
 	}
 
+	public void addPointLight(Vector2 collisionPoint) {
+		PointLight pl = pointLightPool.obtain();
+		pl.setPosition(collisionPoint);
+		pl.setColor(0.41f, 0.78f, 1f, 1f);
+		activeLights.add(pl);
+	}
 }
