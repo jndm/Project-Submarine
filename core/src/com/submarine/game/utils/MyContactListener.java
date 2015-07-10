@@ -13,6 +13,7 @@ import com.submarine.resourses.Player;
 public class MyContactListener implements ContactListener{
 	
 	private Play play;
+	private float lastBulletContactTime = 0;
 	
 	public MyContactListener(Play play) {
 		this.play = play;
@@ -38,21 +39,27 @@ public class MyContactListener implements ContactListener{
 		//Bullet handling
 		if(fa.getUserData() != null && fa.getUserData() instanceof Bullet) { //If fixture a = bullet and fb = wall
 			Bullet b = (Bullet) fb.getUserData();
-			b.addRicochetCount();
-			Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
-			b.addCollisionPoint(collisionPoint);
-			play.addPointLight(collisionPoint);
-			if(b.shouldBeRemoved()) {
-				play.addBulletToBeRemoved(b);
+			if(play.getGameRunningTime() - lastBulletContactTime > 0.01) {	//to prevent double contact
+				b.addRicochetCount();
+				Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
+				b.addCollisionPoint(collisionPoint);
+				play.addPointLight(collisionPoint);
+				if(b.shouldBeRemoved()) {
+					play.addBulletToBeRemoved(b);
+				}
+				lastBulletContactTime = play.getGameRunningTime();
 			}
-		} else if(fb.getUserData() != null && fb.getUserData() instanceof Bullet) { //If fixture a = bullet and fb = wall
+		} else if(fb.getUserData() != null && fb.getUserData() instanceof Bullet) { //If fixture b = bullet and fa = wall
 			Bullet b = (Bullet) fb.getUserData();
-			b.addRicochetCount();
-			Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
-			b.addCollisionPoint(collisionPoint);
-			play.addPointLight(collisionPoint);
-			if(b.shouldBeRemoved()) {
-				play.addBulletToBeRemoved(b);
+			if(play.getGameRunningTime() - lastBulletContactTime > 0.01) {	//to prevent double contact
+				b.addRicochetCount();
+				Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
+				b.addCollisionPoint(collisionPoint);
+				play.addPointLight(collisionPoint);
+				if(b.shouldBeRemoved()) {
+					play.addBulletToBeRemoved(b);
+				}
+				lastBulletContactTime = play.getGameRunningTime();
 			}
 		}
 

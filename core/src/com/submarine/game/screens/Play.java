@@ -35,6 +35,7 @@ import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
 import com.submarine.resourses.Bullet;
+import com.submarine.resourses.Level;
 import com.submarine.resourses.Player;
 
 public class Play implements Screen {
@@ -42,10 +43,10 @@ public class Play implements Screen {
 	//Common stuff
 	private Main game;
 	private World world;
-	private Box2DDebugRenderer box2dRenderer;
-	private OrthogonalTiledMapRenderer mapRenderer;
+	private Level level;
 	private Player player;
 	private float timeElapsed = 0;
+	private float gameRunningTime = 0;
 	
 	//Bullet
 	private Array<Bullet> activeBullets; 
@@ -54,7 +55,6 @@ public class Play implements Screen {
 	
 	//Bullet trail
 	private Sprite bulletTrail;
-	private ShapeRenderer shapeRenderer;
 	private Vector2 shootPos;
 		
 	private BitmapFont font = new BitmapFont();
@@ -83,9 +83,8 @@ public class Play implements Screen {
 		Box2DMapObjectParser parser = new Box2DMapObjectParser(0.03125f);
 		parser.load(world, map);
 		
-		mapRenderer = new OrthogonalTiledMapRenderer(map, parser.getUnitScale(), game.sb);
-		box2dRenderer = new Box2DDebugRenderer();
-		shapeRenderer = new ShapeRenderer();
+		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
+		level = new Level(game, world);
 		
 		////TESTING remove after
 		//Lighting
@@ -168,36 +167,34 @@ public class Play implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.sb.setProjectionMatrix(game.cam.combined);
 
-		mapRenderer.setView(game.cam);
-		mapRenderer.render();
-		box2dRenderer.render(world, game.cam.combined);
+		level.render();
 		
-		rayHandler.setCombinedMatrix(game.cam.combined);
-		rayHandler.updateAndRender();
+		//rayHandler.setCombinedMatrix(game.cam.combined);
+		//rayHandler.updateAndRender();
 		
 		player.render(game.sb, delta);
 		
 		//Render bullet trail
-		shapeRenderer.setProjectionMatrix(game.cam.combined);
-		shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
-		shapeRenderer.begin(ShapeType.Filled);
+		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
+		game.shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
+		game.shapeRenderer.begin(ShapeType.Filled);
 		for(Bullet b : activeBullets){
 			Vector2 bulletpos = b.getBody().getPosition();
 			if(b.getCollisionPoints().size == 0) {	// no collision points
-				shapeRenderer.rectLine(b.getShootingPoint(), bulletpos, Constants.WAVE_WIDTH);
+				game.shapeRenderer.rectLine(b.getShootingPoint(), bulletpos, Constants.WAVE_WIDTH);
 			} else {
-				shapeRenderer.rectLine(b.getShootingPoint(), b.getCollisionPoints().first(), Constants.WAVE_WIDTH); // 1 or more collision points
+				game.shapeRenderer.rectLine(b.getShootingPoint(), b.getCollisionPoints().first(), Constants.WAVE_WIDTH); // 1 or more collision points
 				if(b.getCollisionPoints().size > 1) {	//More than 1 collision points
 					for(int i=0; i<b.getCollisionPoints().size-1; i++) {
-						shapeRenderer.rectLine(b.getCollisionPoints().get(i), b.getCollisionPoints().get(i+1), Constants.WAVE_WIDTH);
+						game.shapeRenderer.rectLine(b.getCollisionPoints().get(i), b.getCollisionPoints().get(i+1), Constants.WAVE_WIDTH);
 					}
-					shapeRenderer.rectLine(b.getCollisionPoints().get(b.getCollisionPoints().size - 1), bulletpos, Constants.WAVE_WIDTH);	// always draw last line to bullet position
+					game.shapeRenderer.rectLine(b.getCollisionPoints().get(b.getCollisionPoints().size - 1), bulletpos, Constants.WAVE_WIDTH);	// always draw last line to bullet position
 				} else {
-					shapeRenderer.rectLine(b.getCollisionPoints().first(), bulletpos, Constants.WAVE_WIDTH); // always draw last line to bullet position
+					game.shapeRenderer.rectLine(b.getCollisionPoints().first(), bulletpos, Constants.WAVE_WIDTH); // always draw last line to bullet position
 				}
 			}
 		}
-		shapeRenderer.end();
+		game.shapeRenderer.end();
 		
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.sb.begin();
@@ -213,6 +210,8 @@ public class Play implements Screen {
 		checkIfBulletsToBeRemoved();
 		fadeOutLights(delta);
 		updateCamera();
+		
+		gameRunningTime += delta;
 	}
 
 	private void fadeOutLights(float delta) {
@@ -301,8 +300,7 @@ public class Play implements Screen {
 	@Override
 	public void dispose() {
 		world.dispose();
-		mapRenderer.dispose();
-		box2dRenderer.dispose();
+		level.dispose();
 		player.dispose();
 		rayHandler.dispose();
 	}
@@ -318,4 +316,9 @@ public class Play implements Screen {
 		pl.setColor(0.41f, 0.78f, 1f, 1f);
 		activeLights.add(pl);
 	}
+
+	public float getGameRunningTime() {
+		return gameRunningTime;
+	}
+	
 }

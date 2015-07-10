@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.submarine.game.screens.Play;
@@ -18,6 +19,7 @@ public class Main extends Game {
 	public static final float STEP = 1 / 60f;
 	
 	public SpriteBatch sb;
+	public ShapeRenderer shapeRenderer;
 	public OrthographicCamera cam;
 	public OrthographicCamera hudCam;
 	
@@ -28,6 +30,7 @@ public class Main extends Game {
 		
 		assetManager = new AssetManager();
 		sb = new SpriteBatch();
+		shapeRenderer = new ShapeRenderer();
 		cam = new OrthographicCamera();
 		cam.setToOrtho(false, VIRTUAL_WIDTH / PPM, VIRTUAL_HEIGHT / PPM);
 		viewport = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, cam);
@@ -44,6 +47,7 @@ public class Main extends Game {
 	
 	 public void dispose() {
 		sb.dispose();
+		shapeRenderer.dispose();
         assetManager.dispose();
     }
 }
