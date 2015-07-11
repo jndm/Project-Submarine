@@ -51,6 +51,7 @@ public class Bullet implements Poolable{
 		Vector2 velocity = new Vector2();
         velocity.set(x - body.getPosition().x, y - body.getPosition().y);
         Vector2 normal = velocity.nor();
+        
         /* Nice print for debugging 
         System.out.println("\nPlayer pos x: "+body.getPosition().x+ " y: "+body.getPosition().y+"\n"+
         "Clicked at x: "+x+ " y: "+y+"\n"+
@@ -104,10 +105,15 @@ public class Bullet implements Poolable{
 		shootingPoint.set(sp);
 		//System.out.println("Adding point shooting point: ("+shootingPoint.x+", "+shootingPoint.y+")");
 	}
+	
+	public float getAngle() {
+		return body.getLinearVelocity().angle();
+	}
 
 	@Override
 	public void reset() {
 		ricochetCount = 0;
 		collisionPoints.clear();
 	}
+
 }

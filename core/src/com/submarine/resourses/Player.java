@@ -82,7 +82,7 @@ public class Player {
 		takeDamageAnimation = new AnimatedBox2DSprite(new AnimatedSprite(new Animation(1/6f, txr)));
 		takeDamageAnimation.setSize(takeDamageAnimation.getWidth() / Main.PPM, takeDamageAnimation.getHeight() / Main.PPM);
 		
-		//Particle-effect test
+		//Particle-effect
 		bubbles = new ParticleEffect();
 		bubbles.load(Gdx.files.internal("effects/bubbles.p"), Gdx.files.internal("effects"));
 		bubbles.start();

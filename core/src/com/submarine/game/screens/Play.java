@@ -15,7 +15,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -52,10 +56,18 @@ public class Play implements Screen {
 	private Array<Bullet> activeBullets; 
 	private Array<Bullet> bulletsToBeRemoved;
 	private BulletPool bulletPool;
+	private Vector2 lastBulletPos;
 	
 	//Bullet trail
 	private Sprite bulletTrail;
 	private Vector2 shootPos;
+	
+	//Testing particle-effect bullet trail
+	private ParticleEffect beam;
+	private ParticleEffectPool beamParticlePool;
+	private Array<PooledEffect> beamParticles;
+	private float particleTimer = 999f;
+	private float particleTimeLimit = 0.07f;
 		
 	private BitmapFont font = new BitmapFont();
 	
@@ -79,14 +91,9 @@ public class Play implements Screen {
 		activeBullets = new Array<Bullet>();
 		shootPos = new Vector2();
 		
-		TiledMap map = new TmxMapLoader().load("maps/test.tmx");
-		Box2DMapObjectParser parser = new Box2DMapObjectParser(0.03125f);
-		parser.load(world, map);
-		
 		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
 		level = new Level(game, world);
 		
-		////TESTING remove after
 		//Lighting
         RayHandler.useDiffuseLight(true);
         RayHandler.setGammaCorrection(true);
@@ -99,7 +106,15 @@ public class Play implements Screen {
         
         pointLightPool = new PointLightPool(rayHandler);
         activeLights = new Array<PointLight>();
-		
+        
+        //Beam particle-effect
+        beam = new ParticleEffect();
+        beam.load(Gdx.files.internal("effects/beam.p"), Gdx.files.internal("effects"));
+        beam.start();
+        
+        beamParticlePool = new ParticleEffectPool(beam, 0, 200); //With 2sec timer max active particles are 120
+        beamParticles = new Array<PooledEffect>();
+        
 		createInputProcessor();	
 	}
 
@@ -153,6 +168,7 @@ public class Play implements Screen {
 				bullet.setPosition(player.getBody().getWorldCenter().x, player.getBody().getWorldCenter().y);
 				bullet.setVelocity(touchpos.x, touchpos.y);
 				bullet.setShootingPoint(player.getBody().getWorldCenter());
+				lastBulletPos = new Vector2(player.getBody().getWorldCenter());
 				activeBullets.add(bullet);
 				return true;
 			}
@@ -175,27 +191,19 @@ public class Play implements Screen {
 		player.render(game.sb, delta);
 		
 		//Render bullet trail
-		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
-		game.shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
-		game.shapeRenderer.begin(ShapeType.Filled);
-		for(Bullet b : activeBullets){
-			Vector2 bulletpos = b.getBody().getPosition();
-			if(b.getCollisionPoints().size == 0) {	// no collision points
-				game.shapeRenderer.rectLine(b.getShootingPoint(), bulletpos, Constants.WAVE_WIDTH);
-			} else {
-				game.shapeRenderer.rectLine(b.getShootingPoint(), b.getCollisionPoints().first(), Constants.WAVE_WIDTH); // 1 or more collision points
-				if(b.getCollisionPoints().size > 1) {	//More than 1 collision points
-					for(int i=0; i<b.getCollisionPoints().size-1; i++) {
-						game.shapeRenderer.rectLine(b.getCollisionPoints().get(i), b.getCollisionPoints().get(i+1), Constants.WAVE_WIDTH);
-					}
-					game.shapeRenderer.rectLine(b.getCollisionPoints().get(b.getCollisionPoints().size - 1), bulletpos, Constants.WAVE_WIDTH);	// always draw last line to bullet position
-				} else {
-					game.shapeRenderer.rectLine(b.getCollisionPoints().first(), bulletpos, Constants.WAVE_WIDTH); // always draw last line to bullet position
-				}
+		
+		game.sb.begin();
+		for(PooledEffect effect : beamParticles) {
+			effect.draw(game.sb, delta);
+			if(effect.isComplete()) {
+				beamParticles.removeValue(effect, true);
+				effect.free();
 			}
 		}
-		game.shapeRenderer.end();
+		game.sb.end();
 		
+		//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
+	
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.sb.begin();
 			font.getData().setScale(1/64f);
@@ -208,10 +216,24 @@ public class Play implements Screen {
 		world.step(1/60f, 8, 3);
 		player.move();
 		checkIfBulletsToBeRemoved();
+		addBulletTrail();
 		fadeOutLights(delta);
 		updateCamera();
 		
 		gameRunningTime += delta;
+	}
+
+	private void addBulletTrail() {
+		for(Bullet b : activeBullets) {
+			Vector2 bulletpos = b.getBody().getPosition();
+			PooledEffect effect = beamParticlePool.obtain();
+			effect.setPosition(bulletpos.x, bulletpos.y);
+			for(ParticleEmitter emitter :  effect.getEmitters()) {
+				emitter.getRotation().setLow(b.getAngle());
+				emitter.getRotation().setHigh(b.getAngle());
+			}
+			beamParticles.add(effect);
+		}
 	}
 
 	private void fadeOutLights(float delta) {
@@ -242,7 +264,6 @@ public class Play implements Screen {
 			world.destroyBody(bullet.getBody());
 			activeBullets.removeValue(bullet, false);
 			bulletPool.free(bullet);
-			//System.out.println("Body destroyed");
 		}
 		bulletsToBeRemoved.clear();
 		bulletsToBeRemoved.shrink();
@@ -252,25 +273,6 @@ public class Play implements Screen {
 		Vector2 playerpos = player.getBody().getPosition();
 		game.cam.position.set(playerpos.x, playerpos.y, 0);
 		game.cam.update();
-		
-		/* In case needed, keeps the camera inside world borders */
-		/*
-		float camx = game.cam.position.x;
-		float camy = game.cam.position.y;
-		float camw = game.cam.viewportWidth;
-		float camh = game.cam.viewportHeight;
-		
-		//Horizontal
-		if(camx - camw/2 <= 0 && camx + camw/2 >= LEVEL_WIDTH) {
-			game.cam.position.x = playerpos.x;
-		}
-		
-		//Vertical
-		if(camy - camh/2 <= 0 && camy + camh/2 >= LEVEL_HEIGHT) {
-			game.cam.position.y = playerpos.y;
-		}
-		*/
-		
 	}
 
 	@Override
@@ -321,4 +323,46 @@ public class Play implements Screen {
 		return gameRunningTime;
 	}
 	
+	
+	/*STUFF IN CASE EVER NEEDED
+		//OLD BULLET TRAIL RENDERING WITH SHAPERENDERER:
+		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
+		game.shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
+		game.shapeRenderer.begin(ShapeType.Filled);
+		for(Bullet b : activeBullets){
+			Vector2 bulletpos = b.getBody().getPosition();
+			if(b.getCollisionPoints().size == 0) {	// no collision points
+				game.shapeRenderer.rectLine(b.getShootingPoint(), bulletpos, Constants.WAVE_WIDTH);
+			} else {
+				game.shapeRenderer.rectLine(b.getShootingPoint(), b.getCollisionPoints().first(), Constants.WAVE_WIDTH); // 1 or more collision points
+				if(b.getCollisionPoints().size > 1) {	//More than 1 collision points
+					for(int i=0; i<b.getCollisionPoints().size-1; i++) {
+						game.shapeRenderer.rectLine(b.getCollisionPoints().get(i), b.getCollisionPoints().get(i+1), Constants.WAVE_WIDTH);
+					}
+					game.shapeRenderer.rectLine(b.getCollisionPoints().get(b.getCollisionPoints().size - 1), bulletpos, Constants.WAVE_WIDTH);	// always draw last line to bullet position
+				} else {
+					game.shapeRenderer.rectLine(b.getCollisionPoints().first(), bulletpos, Constants.WAVE_WIDTH); // always draw last line to bullet position
+				}
+			}
+		}
+		game.shapeRenderer.end();
+		//ENDOF
+
+		//KEEPS CAMERA INSIDE THE GAMEWORLD:
+		float camx = game.cam.position.x;
+		float camy = game.cam.position.y;
+		float camw = game.cam.viewportWidth;
+		float camh = game.cam.viewportHeight;
+		
+		//Horizontal
+		if(camx - camw/2 <= 0 && camx + camw/2 >= LEVEL_WIDTH) {
+			game.cam.position.x = playerpos.x;
+		}
+		
+		//Vertical
+		if(camy - camh/2 <= 0 && camy + camh/2 >= LEVEL_HEIGHT) {
+			game.cam.position.y = playerpos.y;
+		}
+		//ENDOF
+	*/
 }

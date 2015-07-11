@@ -49,8 +49,7 @@ public class Level {
 		MapObjects mapObjects = map.getLayers().get("Walls").getObjects();
 		walls = new Array<Shape2D>();
 		
-		for(MapObject mo : mapObjects) {
-			
+		for(MapObject mo : mapObjects) {	
 			if(mo instanceof CircleMapObject) {
 				walls.add(Utils.scaleDownShape2D((CircleMapObject) mo));
 			} else if(mo instanceof EllipseMapObject) {
@@ -61,12 +60,7 @@ public class Level {
 				walls.add(Utils.scaleDownShape2D((PolylineMapObject) mo));
 			} else if(mo instanceof RectangleMapObject) {
 				walls.add(Utils.scaleDownShape2D((RectangleMapObject) mo));
-			}
-			
-		}
-		
-		for(float v : ((Polyline)walls.get(0)).getTransformedVertices()) {
-			System.out.println(v);
+			}		
 		}
 	}
 
