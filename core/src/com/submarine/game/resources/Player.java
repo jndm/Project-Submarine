@@ -1,4 +1,4 @@
-package com.submarine.resources;
+package com.submarine.game.resources;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;

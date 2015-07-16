@@ -1,4 +1,4 @@
-package com.submarine.resources;
+package com.submarine.game.resources;
 
 import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
 

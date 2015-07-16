@@ -19,14 +19,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.resources.Bullet;
+import com.submarine.game.resources.Level;
+import com.submarine.game.resources.Player;
 import com.submarine.game.utils.BulletPool;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
-import com.submarine.resources.Bullet;
-import com.submarine.resources.Level;
-import com.submarine.resources.Player;
 
 public class Play implements Screen {
 	
