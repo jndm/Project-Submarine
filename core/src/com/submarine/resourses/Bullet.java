@@ -19,8 +19,6 @@ public class Bullet implements Poolable{
 	private Fixture fixture;
 	private FixtureDef fixtureDef;
 	
-	private float speed = 10f;
-	
 	private int ricochetCount = 0;
 	private int maxRicochet = 5;
 	private Array<Vector2> collisionPoints;

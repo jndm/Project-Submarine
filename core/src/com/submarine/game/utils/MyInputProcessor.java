@@ -1,9 +1,6 @@
 package com.submarine.game.utils;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.submarine.resourses.Player;
 
 public class MyInputProcessor implements InputProcessor {
 

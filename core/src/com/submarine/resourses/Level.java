@@ -79,7 +79,7 @@ public class Level {
 				game.shapeRenderer.ellipse(((Ellipse) shape).x, ((Ellipse) shape).y, ((Ellipse) shape).width, ((Ellipse) shape).height);
 			} else if(shape instanceof Polygon) {
 				game.shapeRenderer.polygon(((Polygon) shape).getVertices());
-			} if(shape instanceof Polyline) {
+			} else if(shape instanceof Polyline) {
 				game.shapeRenderer.polyline(((Polyline) shape).getVertices());				
 			} else if(shape instanceof Rectangle) {
 				game.shapeRenderer.rect(((Rectangle) shape).x, ((Rectangle) shape).y, ((Rectangle) shape).width, ((Rectangle) shape).height);

@@ -2,6 +2,8 @@ package com.submarine.game.utils;
 
 public class Constants {
 	
+	public static final float PPM = 32;
+	
 	//Play variables
 	public static final float WAVE_WIDTH = 0.15f;
 	public static final float LIGHT_FADE_TIME = 0.01f;
