@@ -63,12 +63,9 @@ public class Player {
 		
 		//Create sprite for player
 		sprite = new Box2DSprite(new Texture(Gdx.files.internal("player/submarine.normal.png")));
-		sprite.setSize(sprite.getTexture().getWidth() / Main.PPM, sprite.getTexture().getHeight() / Main.PPM);
+		sprite.setSize(sprite.getTexture().getWidth() / Constants.PPM, sprite.getTexture().getHeight() / Constants.PPM);
 			
-		//TEMPORARY SOLUTION * CHANGE TO ASSETMANAGER AT SOME POINT
-		TextureRegion t1 = new TextureRegion(new Texture(Gdx.files.internal("player/submarine.normal.png")));
-		TextureRegion t2 = new TextureRegion(new Texture(Gdx.files.internal("player/submarine.flicker.png")));
-		
+		//TEMPORARY SOLUTION * CHANGE TO ASSETMANAGER AT SOME POINT	
 		TextureRegion[] txr = new TextureRegion[]  
 		{
 			new TextureRegion(new Texture(Gdx.files.internal("player/submarine.normal.png"))), 
@@ -80,9 +77,9 @@ public class Player {
 		};
 		
 		takeDamageAnimation = new AnimatedBox2DSprite(new AnimatedSprite(new Animation(1/6f, txr)));
-		takeDamageAnimation.setSize(takeDamageAnimation.getWidth() / Main.PPM, takeDamageAnimation.getHeight() / Main.PPM);
+		takeDamageAnimation.setSize(takeDamageAnimation.getWidth() / Constants.PPM, takeDamageAnimation.getHeight() / Constants.PPM);
 		
-		//Particle-effect test
+		//Particle-effect
 		bubbles = new ParticleEffect();
 		bubbles.load(Gdx.files.internal("effects/bubbles.p"), Gdx.files.internal("effects"));
 		bubbles.start();
@@ -288,10 +285,10 @@ public class Player {
 		//Scale vertices to world (aka. divide every vertice point with 32)
 		for(int i=0; i<3; i++) {	
 			for(int j=0; j<leftVertices.get(i).length; j++) {
-				leftVertices.get(i)[j] = leftVertices.get(i)[j].scl(1 / Main.PPM);
+				leftVertices.get(i)[j] = leftVertices.get(i)[j].scl(1 / Constants.PPM);
 			}
 			for(int j=0; j<rightVertices.get(i).length; j++) {
-				rightVertices.get(i)[j] = rightVertices.get(i)[j].scl(1 / Main.PPM);
+				rightVertices.get(i)[j] = rightVertices.get(i)[j].scl(1 / Constants.PPM);
 			}
 		}
 		
