@@ -1,4 +1,4 @@
-package com.submarine.resourses;
+package com.submarine.resources;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;

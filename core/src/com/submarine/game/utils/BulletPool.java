@@ -2,7 +2,7 @@ package com.submarine.game.utils;
 
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Pool;
-import com.submarine.resourses.Bullet;
+import com.submarine.resources.Bullet;
 
 public class BulletPool extends Pool<Bullet>{
 

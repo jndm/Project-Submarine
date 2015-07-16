@@ -24,9 +24,9 @@ import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
-import com.submarine.resourses.Bullet;
-import com.submarine.resourses.Level;
-import com.submarine.resourses.Player;
+import com.submarine.resources.Bullet;
+import com.submarine.resources.Level;
+import com.submarine.resources.Player;
 
 public class Play implements Screen {
 	

@@ -7,8 +7,8 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.submarine.game.screens.Play;
-import com.submarine.resourses.Bullet;
-import com.submarine.resourses.Player;
+import com.submarine.resources.Bullet;
+import com.submarine.resources.Player;
 
 public class MyContactListener implements ContactListener{
 	
