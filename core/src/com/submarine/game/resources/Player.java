@@ -52,12 +52,12 @@ public class Player {
 	private float particleTimeLimit = 0.07f;
 	private Vector2 bubblePosition;
 	
-	public Player(World world, float x, float y) {
+	public Player(World world, Vector2 spawnpoint) {
 		movement = new Vector2(0, 0);
 		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		bodyDef.position.set(x, y);
+		bodyDef.position.set(spawnpoint.x, spawnpoint.y);
 		
 		createPlayerFixtures(world, bodyDef);	
 		
@@ -348,5 +348,13 @@ public class Player {
 		bodyShape.dispose(); 
 		cabinShape.dispose();
 		propellerShape.dispose();
+	}
+	
+	public float getPlayerCenterX() { 
+		return body.getPosition().x + sprite.getWidth() / 2;
+	}
+	
+	public float getPlayerCenterY() { 
+		return body.getPosition().y + sprite.getHeight() / 2;
 	}
 }

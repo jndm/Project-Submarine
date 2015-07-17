@@ -64,14 +64,18 @@ public class Play implements Screen {
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
 		
-		player = new Player(world, 6, 22); //Create player
+		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
+		try {
+			level = new Level(game, world);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		player = new Player(world, level.getSpawnpoint()); //Create player
 		bulletPool = new BulletPool(world);
 		bulletsToBeRemoved = new Array<Bullet>();
 		activeBullets = new Array<Bullet>();
-		
-		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
-		level = new Level(game, world);
-		
+
 		//Lighting
         RayHandler.useDiffuseLight(true);
         RayHandler.setGammaCorrection(true);
@@ -162,8 +166,8 @@ public class Play implements Screen {
 
 		level.render();
 		
-		//rayHandler.setCombinedMatrix(game.cam.combined);
-		//rayHandler.updateAndRender();
+		rayHandler.setCombinedMatrix(game.cam);
+		rayHandler.updateAndRender();
 		
 		player.render(game.sb, delta);
 		
@@ -184,7 +188,7 @@ public class Play implements Screen {
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.sb.begin();
 			font.getData().setScale(1/64f);
-			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), Main.VIRTUAL_WIDTH / Constants.PPM * 0.94f, Main.VIRTUAL_HEIGHT / Constants.PPM * 0.99f);
+			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), Main.VIRTUAL_WIDTH * 0.5f, Main.VIRTUAL_HEIGHT * 0.5f);
 		game.sb.end();
 		
 	}
@@ -192,10 +196,10 @@ public class Play implements Screen {
 	private void update(float delta) {
 		world.step(1/60f, 8, 3);
 		player.move();
+		updateCamera();
 		checkIfBulletsToBeRemoved();
 		addBulletTrail();
 		fadeOutLights(delta);
-		updateCamera();
 		
 		gameRunningTime += delta;
 	}

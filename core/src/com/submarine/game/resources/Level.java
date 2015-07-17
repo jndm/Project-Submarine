@@ -1,7 +1,5 @@
 package com.submarine.game.resources;
 
-import net.dermetfan.gdx.physics.box2d.Box2DMapObjectParser;
-
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -19,10 +17,12 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.utils.Box2DMapObjectParserHelper;
 import com.submarine.game.utils.Utils;
 
 public class Level {
@@ -34,18 +34,24 @@ public class Level {
 	private OrthogonalTiledMapRenderer mapRenderer;
 	
 	private Array<Shape2D> walls;
+	private Vector2 spawnpoint;
+	private Ellipse goal;
 	
 	public Level(Main game, World world) {	
 		this.game = game;
 		this.world = world;
 		
 		TiledMap map = new TmxMapLoader().load("maps/test.tmx");
-		Box2DMapObjectParser parser = new Box2DMapObjectParser(0.03125f);
-		parser.load(world, map);
+		Box2DMapObjectParserHelper parser = new Box2DMapObjectParserHelper(0.03125f);
+		try {
+			parser.load(world, map);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		mapRenderer = new OrthogonalTiledMapRenderer(map, parser.getUnitScale(), game.sb);
 		box2dRenderer = new Box2DDebugRenderer();
-		
+	
 		MapObjects mapObjects = map.getLayers().get("Walls").getObjects();
 		walls = new Array<Shape2D>();
 		
@@ -53,7 +59,7 @@ public class Level {
 			if(mo instanceof CircleMapObject) {
 				walls.add(Utils.scaleDownShape2D((CircleMapObject) mo));
 			} else if(mo instanceof EllipseMapObject) {
-				walls.add(Utils.scaleDownShape2D((EllipseMapObject) mo));	//Not working with box2d
+				walls.add(Utils.scaleDownShape2D((EllipseMapObject) mo));	
 			} else if(mo instanceof PolygonMapObject) {
 				walls.add(Utils.scaleDownShape2D((PolygonMapObject) mo));
 			} else if(mo instanceof PolylineMapObject) {
@@ -62,6 +68,13 @@ public class Level {
 				walls.add(Utils.scaleDownShape2D((RectangleMapObject) mo));
 			}		
 		}
+		
+		//Handle spawn & goal point creating
+		Ellipse spawnObject = Utils.scaleDownShape2D((EllipseMapObject) map.getLayers().get("Points").getObjects().get("Spawn"));
+		spawnpoint = new Vector2(spawnObject.x + spawnObject.width/2, spawnObject.y + spawnObject.height/2);
+		
+		goal = Utils.scaleDownShape2D((EllipseMapObject) map.getLayers().get("Points").getObjects().get("Goal"));
+		
 	}
 
 	public void render() {
@@ -85,6 +98,7 @@ public class Level {
 				game.shapeRenderer.rect(((Rectangle) shape).x, ((Rectangle) shape).y, ((Rectangle) shape).width, ((Rectangle) shape).height);
 			}
 		}
+		game.shapeRenderer.ellipse(goal.x, goal.y, goal.width, goal.height);
 		game.shapeRenderer.end();
 	}
 	
@@ -92,4 +106,13 @@ public class Level {
 		mapRenderer.dispose();
 		box2dRenderer.dispose();
 	}
+
+	public Vector2 getSpawnpoint() {
+		return spawnpoint;
+	}
+
+	public Ellipse getGoal() {
+		return goal;
+	}
+	
 }
