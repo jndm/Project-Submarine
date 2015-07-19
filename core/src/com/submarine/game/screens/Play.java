@@ -8,6 +8,7 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -37,6 +38,7 @@ public class Play implements Screen {
 	private Player player;
 	private float timeElapsed = 0;
 	private float gameRunningTime = 0;
+	private Color currentThemeColor;
 	
 	//Bullet
 	private Array<Bullet> activeBullets; 
@@ -61,17 +63,20 @@ public class Play implements Screen {
 	
 	@Override
 	public void show() {
+		
+		checkThemeColor();
+		
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
 		
 		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
 		try {
-			level = new Level(game, world);
+			level = new Level(this, game, world);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		
-		player = new Player(world, level.getSpawnpoint()); //Create player
+		player = new Player(world, level.getSpawnpoint(), this); //Create player
 		bulletPool = new BulletPool(world);
 		bulletsToBeRemoved = new Array<Bullet>();
 		activeBullets = new Array<Bullet>();
@@ -86,7 +91,7 @@ public class Play implements Screen {
         rayHandler.setBlurNum(1);
         rayHandler.setShadows(true);
         
-        pointLightPool = new PointLightPool(rayHandler);
+        pointLightPool = new PointLightPool(rayHandler, this);
         activeLights = new Array<PointLight>();
         
         //Beam particle-effect
@@ -116,6 +121,10 @@ public class Play implements Screen {
 					break;	
 					case Keys.D:
 						player.setRight(true);
+					break;
+					case Keys.ESCAPE:
+						dispose();
+						game.setScreen(new Menu(game));
 					break;
 				}
 				return true;
@@ -210,6 +219,8 @@ public class Play implements Screen {
 			PooledEffect effect = beamParticlePool.obtain();
 			effect.setPosition(bulletpos.x, bulletpos.y);
 			for(ParticleEmitter emitter :  effect.getEmitters()) {
+				float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
+				emitter.getTint().setColors(color);
 				emitter.getRotation().setLow(b.getAngle());
 				emitter.getRotation().setHigh(b.getAngle());
 			}
@@ -258,7 +269,7 @@ public class Play implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		game.cam.setToOrtho(false, width / Constants.PPM, height / Constants.PPM);
+		game.cam.setToOrtho(false, width / Constants.PPM , height / Constants.PPM);
 		game.cam.update();
 	}
 
@@ -296,7 +307,7 @@ public class Play implements Screen {
 	public void addPointLight(Vector2 collisionPoint) {
 		PointLight pl = pointLightPool.obtain();
 		pl.setPosition(collisionPoint);
-		pl.setColor(0.41f, 0.78f, 1f, 1f);
+		pl.setColor(currentThemeColor);
 		activeLights.add(pl);
 	}
 
@@ -304,6 +315,19 @@ public class Play implements Screen {
 		return gameRunningTime;
 	}
 	
+	private void checkThemeColor() {
+		if(game.theme == Constants.Theme.RED) {
+			currentThemeColor = Constants.RED;
+		} else if(game.theme == Constants.Theme.GREEN) {
+			currentThemeColor = Constants.GREEN;
+		} else if(game.theme == Constants.Theme.BLUE) {
+			currentThemeColor = Constants.BLUE;
+		}
+	}
+
+	public Color getCurrentThemeColor() {
+		return currentThemeColor;
+	}
 	
 	/*STUFF IN CASE EVER NEEDED
 		//OLD BULLET TRAIL RENDERING WITH SHAPERENDERER:

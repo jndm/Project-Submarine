@@ -1,5 +1,6 @@
 package com.submarine.game.resources;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -22,12 +23,15 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.screens.Play;
 import com.submarine.game.utils.Box2DMapObjectParserHelper;
+import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.Utils;
 
 public class Level {
 	
 	private Main game;
+	private Play play;
 	private World world;
 	
 	private Box2DDebugRenderer box2dRenderer;
@@ -37,12 +41,13 @@ public class Level {
 	private Vector2 spawnpoint;
 	private Ellipse goal;
 	
-	public Level(Main game, World world) {	
+	public Level(Play play, Main game, World world) {	
 		this.game = game;
 		this.world = world;
+		this.play = play;
 		
 		TiledMap map = new TmxMapLoader().load("maps/test.tmx");
-		Box2DMapObjectParserHelper parser = new Box2DMapObjectParserHelper(0.03125f);
+		Box2DMapObjectParserHelper parser = new Box2DMapObjectParserHelper(1 / Constants.PPM);
 		try {
 			parser.load(world, map);
 		} catch (Exception e) {
@@ -78,12 +83,12 @@ public class Level {
 	}
 
 	public void render() {
-		//mapRenderer.setView(game.cam);
-		//mapRenderer.render();
+		mapRenderer.setView(game.cam);
+		mapRenderer.render();
 		//box2dRenderer.render(world, game.cam.combined);
 		
 		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
-		game.shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
+		game.shapeRenderer.setColor(play.getCurrentThemeColor());
 		game.shapeRenderer.begin(ShapeType.Line);
 		for(Shape2D shape : walls) {
 			if(shape instanceof Circle) {
@@ -114,5 +119,5 @@ public class Level {
 	public Ellipse getGoal() {
 		return goal;
 	}
-	
+
 }

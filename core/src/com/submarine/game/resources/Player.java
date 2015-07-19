@@ -23,9 +23,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.screens.Play;
 import com.submarine.game.utils.Constants;
 
 public class Player {
+	
+	private Play play;
 	
 	//Body, fixture, sprite and animations
 	private Body body;
@@ -52,7 +55,9 @@ public class Player {
 	private float particleTimeLimit = 0.07f;
 	private Vector2 bubblePosition;
 	
-	public Player(World world, Vector2 spawnpoint) {
+	public Player(World world, Vector2 spawnpoint, Play play) {
+		this.play = play;
+		
 		movement = new Vector2(0, 0);
 		
 		BodyDef bodyDef = new BodyDef();
@@ -64,6 +69,7 @@ public class Player {
 		//Create sprite for player
 		sprite = new Box2DSprite(new Texture(Gdx.files.internal("player/submarine.normal.png")));
 		sprite.setSize(sprite.getTexture().getWidth() / Constants.PPM, sprite.getTexture().getHeight() / Constants.PPM);
+		sprite.setColor(play.getCurrentThemeColor());
 			
 		//TEMPORARY SOLUTION * CHANGE TO ASSETMANAGER AT SOME POINT	
 		TextureRegion[] txr = new TextureRegion[]  
@@ -165,6 +171,8 @@ public class Player {
 		if(particleTimer >= particleTimeLimit) {
 			PooledEffect effect = particlePool.obtain();
 			effect.setPosition(bubblePosition.x, bubblePosition.y);
+			float[] color = { play.getCurrentThemeColor().r, play.getCurrentThemeColor().g, play.getCurrentThemeColor().b };
+			effect.getEmitters().get(0).getTint().setColors(color);
 			effects.add(effect);
 			particleTimer = 0;
 		}
