@@ -1,5 +1,12 @@
 package com.submarine.game.resources;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -24,7 +31,14 @@ public class Bullet implements Poolable{
 	private Array<Vector2> collisionPoints;
 	private Vector2 shootingPoint;
 	
-	public Bullet(World world, float x, float y) {
+	private ParticleEffect beam;
+	
+	private Color currentThemeColor;
+	private boolean bodyRemoved = false;
+	
+	public Bullet(World world, float x, float y, Color currentThemeColor) {
+		this.currentThemeColor = currentThemeColor;
+		
 		collisionPoints = new Array<Vector2>();
 		shootingPoint = new Vector2();
 		
@@ -39,10 +53,15 @@ public class Bullet implements Poolable{
 		fixtureDef.filter.categoryBits = Constants.BULLET_CATEGORY;
 		fixtureDef.filter.maskBits = Constants.BULLET_MASK;
 		
+		//Beam particle-effect
+		beam = new ParticleEffect();
+        beam.load(Gdx.files.internal("effects/beam.p"), Gdx.files.internal("effects"));
+        beam.start();
 	}
 	
 	public void setPosition(float x, float y) {
 		body.setTransform(x, y, 0);
+		beam.setPosition(x, y);	
 	}
 	
 	public void setVelocity(float x, float y) {
@@ -87,6 +106,10 @@ public class Bullet implements Poolable{
 		circle.dispose();
 	}
 	
+	public void render(SpriteBatch sb, float delta) {
+		beam.draw(sb, delta);
+	}
+	
 	public void addCollisionPoint(Vector2 cp) {
 		collisionPoints.add(cp);
 	}
@@ -110,8 +133,41 @@ public class Bullet implements Poolable{
 
 	@Override
 	public void reset() {
+		bodyRemoved = false;
 		ricochetCount = 0;
 		collisionPoints.clear();
+		beam.getEmitters().get(0).reset();
 	}
 
+	public void updateBulletTrail() {
+		Vector2 bulletpos = body.getPosition();
+		beam.setPosition(bulletpos.x, bulletpos.y);
+        
+		float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
+        for(ParticleEmitter emitter : beam.getEmitters()) {
+			emitter.getTint().setColors(color);
+			emitter.getRotation().setLow(getAngle());
+			emitter.getRotation().setHigh(getAngle());
+		}
+	}
+	
+	public boolean isParticleEffectComplete() {
+		return beam.isComplete();
+	}
+
+	public void dispose() {
+		beam.dispose();
+	}
+
+	public void setBodyRemoved(boolean b) {
+		bodyRemoved  = b;
+	}
+	
+	public boolean isBodyRemoved() {
+		return bodyRemoved;
+	}
+
+	public void allowParticleCompletion() {
+		beam.allowCompletion();
+	}
 }

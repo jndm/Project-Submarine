@@ -31,7 +31,7 @@ public final class Utils {
 		
 		float[] verticesToWorldSize = new float[polyline.getVertices().length]; //Scale down vertices
         for(int i=0; i<polyline.getVertices().length; i++) {
-			verticesToWorldSize[i] = polyline.getTransformedVertices()[i] * 1/32f;
+			verticesToWorldSize[i] = polyline.getTransformedVertices()[i] * 1/Constants.PPM;
 		}
 		
         polyline.setVertices(verticesToWorldSize);
@@ -64,7 +64,7 @@ public final class Utils {
 		
 		float[] verticesToWorldSize = new float[polygon.getVertices().length]; //Scale down vertices
         for(int i=0; i<polygon.getVertices().length; i++) {
-			verticesToWorldSize[i] = polygon.getTransformedVertices()[i] * 1/32f;
+			verticesToWorldSize[i] = polygon.getTransformedVertices()[i] * 1/Constants.PPM;
 		}
 		polygon.setVertices(verticesToWorldSize);
 		

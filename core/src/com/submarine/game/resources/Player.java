@@ -5,6 +5,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -23,9 +24,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.screens.Play;
 import com.submarine.game.utils.Constants;
 
 public class Player {
+	
+	private Play play;
 	
 	//Body, fixture, sprite and animations
 	private Body body;
@@ -52,7 +56,9 @@ public class Player {
 	private float particleTimeLimit = 0.07f;
 	private Vector2 bubblePosition;
 	
-	public Player(World world, Vector2 spawnpoint) {
+	public Player(World world, Vector2 spawnpoint, Play play) {
+		this.play = play;
+		
 		movement = new Vector2(0, 0);
 		
 		BodyDef bodyDef = new BodyDef();
@@ -64,6 +70,7 @@ public class Player {
 		//Create sprite for player
 		sprite = new Box2DSprite(new Texture(Gdx.files.internal("player/submarine.normal.png")));
 		sprite.setSize(sprite.getTexture().getWidth() / Constants.PPM, sprite.getTexture().getHeight() / Constants.PPM);
+		sprite.setColor(play.getCurrentThemeColor());
 			
 		//TEMPORARY SOLUTION * CHANGE TO ASSETMANAGER AT SOME POINT	
 		TextureRegion[] txr = new TextureRegion[]  
@@ -93,11 +100,16 @@ public class Player {
 		sb.begin();
 		if(takeDamage) {
 			takeDamageAnimation.update();
-			takeDamageAnimation.draw(sb);
+			if(takeDamageAnimation.getAnimation().getKeyFrameIndex(takeDamageAnimation.getTime()) % 2 == 0) { //Tint every other frame with theme color
+				takeDamageAnimation.setColor(play.getCurrentThemeColor());
+			} else {
+				takeDamageAnimation.setColor(Constants.WHITE);
+			}
+			takeDamageAnimation.draw(sb);		
 			if(takeDamageAnimation.isAnimationFinished()) {
 				takeDamage = false;
 				takeDamageAnimation.setTime(0);
-			}
+			}			
 		} else {
 			sprite.draw(sb);
 		}
@@ -165,6 +177,8 @@ public class Player {
 		if(particleTimer >= particleTimeLimit) {
 			PooledEffect effect = particlePool.obtain();
 			effect.setPosition(bubblePosition.x, bubblePosition.y);
+			float[] color = { play.getCurrentThemeColor().r, play.getCurrentThemeColor().g, play.getCurrentThemeColor().b };
+			effect.getEmitters().get(0).getTint().setColors(color);
 			effects.add(effect);
 			particleTimer = 0;
 		}
@@ -210,6 +224,11 @@ public class Player {
 	
 	public void dispose() {
 		sprite.getTexture().dispose();
+		takeDamageAnimation.getAnimatedSprite().getTexture().dispose();
+		bubbles.dispose();
+		particlePool.freeAll(effects);
+		particlePool.clear();
+		effects.clear();
 	}
 
 	public void setRight(boolean right) {

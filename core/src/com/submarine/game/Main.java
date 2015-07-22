@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.submarine.game.screens.Play;
+import com.submarine.game.screens.Mainmenu;
+import com.submarine.game.utils.Constants;
+import com.submarine.game.utils.Constants.Theme;
 
 public class Main extends Game {
 	
@@ -22,27 +24,31 @@ public class Main extends Game {
 	public ShapeRenderer shapeRenderer;
 	public OrthographicCamera cam;
 	public OrthographicCamera hudCam;
-	
-	private AssetManager assetManager;
 	private Viewport viewport, viewport2;
 	
+	public AssetManager assetManager;
+	
+	public Theme theme;
+
 	public void create() {
 		
 		assetManager = new AssetManager();
+		
 		sb = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+		
 		cam = new OrthographicCamera();
-		cam.setToOrtho(false, VIRTUAL_WIDTH / PPM, VIRTUAL_HEIGHT / PPM);
+		cam.setToOrtho(false, VIRTUAL_WIDTH / Constants.PPM, VIRTUAL_HEIGHT / Constants.PPM);
 		viewport = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, cam);
+		
 		hudCam = new OrthographicCamera();
-		hudCam.setToOrtho(false, VIRTUAL_WIDTH / PPM, VIRTUAL_HEIGHT / PPM);
+		hudCam.setToOrtho(false, VIRTUAL_WIDTH / Constants.PPM, VIRTUAL_HEIGHT / Constants.PPM);
 		viewport2 = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, hudCam);
-		this.setScreen(new Play(this));
-	}
-
-	@Override
-	public void render () {
-		super.render();
+		
+		theme = Constants.Theme.BLUE;
+		
+		this.setScreen(new Mainmenu(this));
+		
 	}
 	
 	 public void dispose() {
