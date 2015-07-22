@@ -56,9 +56,6 @@ public class MyContactListener implements ContactListener{
 				Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
 				b.addCollisionPoint(collisionPoint);
 				play.addPointLight(collisionPoint);
-				if(b.shouldBeRemoved()) {
-					play.addBulletToBeRemoved(b);
-				}
 				lastBulletContactTime = play.getGameRunningTime();
 			}
 		} else if(fb.getUserData() != null && fb.getUserData() instanceof Bullet) { //If fixture b = bullet and fa = wall
@@ -68,9 +65,6 @@ public class MyContactListener implements ContactListener{
 				Vector2 collisionPoint = new Vector2(b.getBody().getWorldCenter());
 				b.addCollisionPoint(collisionPoint);
 				play.addPointLight(collisionPoint);
-				if(b.shouldBeRemoved()) {
-					play.addBulletToBeRemoved(b);
-				}
 				lastBulletContactTime = play.getGameRunningTime();
 			}
 		}

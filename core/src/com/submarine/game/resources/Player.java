@@ -5,6 +5,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -99,11 +100,16 @@ public class Player {
 		sb.begin();
 		if(takeDamage) {
 			takeDamageAnimation.update();
-			takeDamageAnimation.draw(sb);
+			if(takeDamageAnimation.getAnimation().getKeyFrameIndex(takeDamageAnimation.getTime()) % 2 == 0) { //Tint every other frame with theme color
+				takeDamageAnimation.setColor(play.getCurrentThemeColor());
+			} else {
+				takeDamageAnimation.setColor(Constants.WHITE);
+			}
+			takeDamageAnimation.draw(sb);		
 			if(takeDamageAnimation.isAnimationFinished()) {
 				takeDamage = false;
 				takeDamageAnimation.setTime(0);
-			}
+			}			
 		} else {
 			sprite.draw(sb);
 		}
@@ -218,6 +224,11 @@ public class Player {
 	
 	public void dispose() {
 		sprite.getTexture().dispose();
+		takeDamageAnimation.getAnimatedSprite().getTexture().dispose();
+		bubbles.dispose();
+		particlePool.freeAll(effects);
+		particlePool.clear();
+		effects.clear();
 	}
 
 	public void setRight(boolean right) {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.submarine.game.screens.Menu;
+import com.submarine.game.screens.Mainmenu;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.Constants.Theme;
 
@@ -45,9 +45,9 @@ public class Main extends Game {
 		hudCam.setToOrtho(false, VIRTUAL_WIDTH / Constants.PPM, VIRTUAL_HEIGHT / Constants.PPM);
 		viewport2 = new FillViewport(VIRTUAL_WIDTH * ASPECT_RATIO, VIRTUAL_HEIGHT, hudCam);
 		
-		theme = Constants.Theme.GREEN;
+		theme = Constants.Theme.BLUE;
 		
-		this.setScreen(new Menu(this));
+		this.setScreen(new Mainmenu(this));
 		
 	}
 	

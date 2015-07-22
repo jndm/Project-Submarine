@@ -44,11 +44,6 @@ public class Play implements Screen {
 	private Array<Bullet> activeBullets; 
 	private Array<Bullet> bulletsToBeRemoved;
 	private BulletPool bulletPool;
-	
-	//Testing particle-effect bullet trail
-	private ParticleEffect beam;
-	private ParticleEffectPool beamParticlePool;
-	private Array<PooledEffect> beamParticles;
 		
 	private BitmapFont font = new BitmapFont();
 	
@@ -77,7 +72,7 @@ public class Play implements Screen {
 		}
 		
 		player = new Player(world, level.getSpawnpoint(), this); //Create player
-		bulletPool = new BulletPool(world);
+		bulletPool = new BulletPool(world, currentThemeColor);
 		bulletsToBeRemoved = new Array<Bullet>();
 		activeBullets = new Array<Bullet>();
 
@@ -93,14 +88,6 @@ public class Play implements Screen {
         
         pointLightPool = new PointLightPool(rayHandler, this);
         activeLights = new Array<PointLight>();
-        
-        //Beam particle-effect
-        beam = new ParticleEffect();
-        beam.load(Gdx.files.internal("effects/beam.p"), Gdx.files.internal("effects"));
-        beam.start();
-        
-        beamParticlePool = new ParticleEffectPool(beam, 0, 200); //With 2sec timer max active particles are 120
-        beamParticles = new Array<PooledEffect>();
         
 		createInputProcessor();	
 	}
@@ -123,8 +110,7 @@ public class Play implements Screen {
 						player.setRight(true);
 					break;
 					case Keys.ESCAPE:
-						dispose();
-						game.setScreen(new Menu(game));
+						game.setScreen(new Mainmenu(game));
 					break;
 				}
 				return true;
@@ -153,7 +139,6 @@ public class Play implements Screen {
 			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 				Vector3 touchpos = new Vector3(screenX, screenY, 0);
 				game.cam.unproject(touchpos);
-				
 				Bullet bullet = (Bullet) bulletPool.obtain();
 				bullet.addToWorld(world);
 				bullet.setPosition(player.getBody().getWorldCenter().x, player.getBody().getWorldCenter().y);
@@ -178,19 +163,14 @@ public class Play implements Screen {
 		rayHandler.setCombinedMatrix(game.cam);
 		rayHandler.updateAndRender();
 		
-		player.render(game.sb, delta);
-		
 		//Render bullet trail
-		
 		game.sb.begin();
-		for(PooledEffect effect : beamParticles) {
-			effect.draw(game.sb, delta);
-			if(effect.isComplete()) {
-				beamParticles.removeValue(effect, true);
-				effect.free();
-			}
+		for(Bullet bullet : activeBullets) {
+			bullet.render(game.sb, delta);
 		}
 		game.sb.end();
+		
+		player.render(game.sb, delta);
 		
 		//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
 	
@@ -207,24 +187,15 @@ public class Play implements Screen {
 		player.move();
 		updateCamera();
 		checkIfBulletsToBeRemoved();
-		addBulletTrail();
+		updateBulletTrail();
 		fadeOutLights(delta);
 		
 		gameRunningTime += delta;
 	}
 
-	private void addBulletTrail() {
+	private void updateBulletTrail() {
 		for(Bullet b : activeBullets) {
-			Vector2 bulletpos = b.getBody().getPosition();
-			PooledEffect effect = beamParticlePool.obtain();
-			effect.setPosition(bulletpos.x, bulletpos.y);
-			for(ParticleEmitter emitter :  effect.getEmitters()) {
-				float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
-				emitter.getTint().setColors(color);
-				emitter.getRotation().setLow(b.getAngle());
-				emitter.getRotation().setHigh(b.getAngle());
-			}
-			beamParticles.add(effect);
+			b.updateBulletTrail();
 		}
 	}
 
@@ -249,16 +220,23 @@ public class Play implements Screen {
 		}		
 	}
 
-	private void checkIfBulletsToBeRemoved() {
-		Iterator<Bullet> i = bulletsToBeRemoved.iterator();
+	private void checkIfBulletsToBeRemoved() {	
+		Iterator<Bullet> i = activeBullets.iterator();
 		while(i.hasNext()) {
 			Bullet bullet = i.next();
-			world.destroyBody(bullet.getBody());
-			activeBullets.removeValue(bullet, false);
-			bulletPool.free(bullet);
+			
+			if(!bullet.isBodyRemoved() && bullet.shouldBeRemoved()) {
+				world.destroyBody(bullet.getBody());
+				bullet.setBodyRemoved(true);
+				bullet.allowParticleCompletion();
+			}
+			
+			if(bullet.isParticleEffectComplete() && bullet.shouldBeRemoved()) {
+				activeBullets.removeValue(bullet, true);
+				bulletPool.free(bullet);
+			}
+			
 		}
-		bulletsToBeRemoved.clear();
-		bulletsToBeRemoved.shrink();
 	}
 
 	private void updateCamera() {
@@ -287,8 +265,7 @@ public class Play implements Screen {
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		dispose();
 	}
 
 	@Override
@@ -297,6 +274,20 @@ public class Play implements Screen {
 		level.dispose();
 		player.dispose();
 		rayHandler.dispose();
+		
+		for(Bullet b : activeBullets) {
+			b.dispose();
+		}
+		
+		bulletPool.freeAll(activeBullets);
+		bulletPool.clear();
+		activeBullets.clear();
+		
+		font.dispose();
+		
+		pointLightPool.freeAll(activeLights);
+		pointLightPool.clear();
+		activeLights.clear();
 	}
 
 	public void addBulletToBeRemoved(Bullet bullet) {

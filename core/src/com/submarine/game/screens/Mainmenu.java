@@ -14,29 +14,27 @@ import com.submarine.game.Main;
 import com.submarine.game.ui.OptionsDialog;
 import com.submarine.game.utils.Constants;
 
-public class Menu implements Screen {
+public class Mainmenu implements Screen {
 	
 	private Main game;
 	private Stage stage;
 	private Skin skin;
 	private Table mastertable;
 	private TextureAtlas atlas;
-	private TextButton playButton, exitButton, optionsButton;
 	private String currentTheme;
 	
-	public Menu(Main game) {
+	public Mainmenu(Main game) {
 		this.game = game;
 	}
 
 	@Override
 	public void show() {
 		applySettings(false);
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
-	public void render(float delta) {
-		Gdx.input.setInputProcessor(stage);
-		
+	public void render(float delta) {		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.sb.setProjectionMatrix(stage.getCamera().combined);
@@ -47,45 +45,23 @@ public class Menu implements Screen {
 	}
 
 	@Override
-	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
+		dispose();
 	}
 
 	@Override
 	public void dispose() {
-		game.assetManager.unload(currentTheme);
 		skin.dispose();
 		stage.dispose();
-		atlas.dispose();
+		atlas.dispose();	
 	}
 
 	public void applySettings(boolean themeChanged) {
 		
 		//Dispose last loaded items if they have been changed
-		if(themeChanged && game.assetManager.get(currentTheme) != null) {
+		if(themeChanged && game.assetManager.isLoaded(currentTheme)) {
 			game.assetManager.unload(currentTheme);
-			skin.dispose();
-			stage.dispose();
-			atlas.dispose();
+			dispose();
 		}
 		
 		if(game.theme == Constants.Theme.RED) {
@@ -106,19 +82,18 @@ public class Menu implements Screen {
 		
 		mastertable = new Table(skin);
 		mastertable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		playButton = new TextButton("Play", skin, "button");
+		TextButton playButton = new TextButton("Play", skin, "button");
 		playButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				dispose();
-				game.setScreen(new Play(game));
+				game.setScreen(new LevelSelection(game, currentTheme));
 			}
 		});
 		
-		optionsButton = new TextButton("Options", skin, "button");
+		TextButton optionsButton = new TextButton("Options", skin, "button");
 		optionsButton.addListener(new OptionsClickListener(this));
 		
-		exitButton = new TextButton("Exit", skin, "button");
+		TextButton exitButton = new TextButton("Exit", skin, "button");
 		exitButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -139,9 +114,9 @@ public class Menu implements Screen {
 	//Options clicklistener is here to prevent too many different classes
 	public class OptionsClickListener extends ClickListener {
 		
-		private Menu menu;
+		private Mainmenu menu;
 		
-		public OptionsClickListener(Menu menu) {
+		public OptionsClickListener(Mainmenu menu) {
 			this.menu = menu;
 		}
 		
@@ -149,6 +124,23 @@ public class Menu implements Screen {
 		public void clicked(InputEvent event, float x, float y) {
 			new OptionsDialog("Options", skin, game, menu).show(stage);
 		}
+		
+	}
+	
+	@Override
+	public void resize(int width, int height) {
+		stage.getViewport().update(width, height, true);
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
 		
 	}
 }

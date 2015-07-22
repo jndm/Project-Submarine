@@ -11,6 +11,7 @@ public class Constants {
 	public static final Color BLUE 	= new Color( 0.41f, 0.78f, 1f, 1f);
 	public static final Color RED	= new Color( 1f, 0.19f, 0f, 1f);
 	public static final Color GREEN = new Color( 0.49f, 0.78f, 0.31f, 1f);
+	public static final Color WHITE = new Color( 1f, 1f, 1f, 1f);
 	
 	//Atlasses
 	public static final String BLUE_UI_ATLAS  = "ui/bluetheme/bluetheme_uipack.pack";

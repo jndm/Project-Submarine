@@ -1,6 +1,5 @@
 package com.submarine.game.ui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
@@ -11,14 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.submarine.game.Main;
-import com.submarine.game.screens.Menu;
+import com.submarine.game.screens.Mainmenu;
 import com.submarine.game.utils.Constants;
 
 public class OptionsDialog extends Dialog{
 	
 	private Main game;
 	
-	public OptionsDialog(String title, Skin skin, Main game, final Menu menu) {
+	public OptionsDialog(String title, Skin skin, Main game, final Mainmenu menu) {
 		super(title, skin);
 		this.game = game;
 		
