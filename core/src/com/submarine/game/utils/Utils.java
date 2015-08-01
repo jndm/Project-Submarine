@@ -1,8 +1,14 @@
 package com.submarine.game.utils;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.maps.objects.CircleMapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
@@ -80,6 +86,31 @@ public final class Utils {
 		rectangle.y 		= rectangle.y * 1/Constants.PPM;
 		
 		return rectangle;
+	}
+	
+	/**
+	 * Returns bitmapfont created from ttf file. 
+	 * <p>
+	 *
+	 * @param  file an absolute path to .ttf file
+	 * @param  size fontsize
+	 * @return BitmapFont
+	 */
+	public static BitmapFont createFont(String file, float size) {
+		FileHandle fontFile = Gdx.files.internal(file);
+	    FreeTypeFontGenerator generator = new FreeTypeFontGenerator(fontFile);
+	    
+	    FreeTypeFontParameter parameter = new FreeTypeFontParameter();    
+	    parameter.size = (int)Math.ceil(size);
+	    
+	    parameter.minFilter = TextureFilter.Nearest;
+	    parameter.magFilter = TextureFilter.MipMapLinearNearest;
+	    
+	   
+	    BitmapFont textFont = generator.generateFont(parameter);
+
+	    generator.dispose();
+	    return textFont;
 	}
 	
 }

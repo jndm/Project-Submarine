@@ -56,6 +56,9 @@ public class Bullet implements Poolable{
 		//Beam particle-effect
 		beam = new ParticleEffect();
         beam.load(Gdx.files.internal("effects/beam.p"), Gdx.files.internal("effects"));
+
+        float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
+		beam.getEmitters().get(0).getTint().setColors(color);
         beam.start();
 	}
 	
@@ -143,9 +146,7 @@ public class Bullet implements Poolable{
 		Vector2 bulletpos = body.getPosition();
 		beam.setPosition(bulletpos.x, bulletpos.y);
         
-		float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
         for(ParticleEmitter emitter : beam.getEmitters()) {
-			emitter.getTint().setColors(color);
 			emitter.getRotation().setLow(getAngle());
 			emitter.getRotation().setHigh(getAngle());
 		}

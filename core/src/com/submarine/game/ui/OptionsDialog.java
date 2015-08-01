@@ -23,7 +23,7 @@ public class OptionsDialog extends Dialog{
 		
 		createThemeChoosingCheckBoxGroup(skin);
 		
-		TextButton applyButton = new TextButton("Apply", skin);
+		TextButton applyButton = new TextButton("Apply", skin, "optionsbutton");
 		applyButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -32,7 +32,7 @@ public class OptionsDialog extends Dialog{
 			}
 		});
 		
-		TextButton cancelButton = new TextButton("Cancel", skin);
+		TextButton cancelButton = new TextButton("Cancel", skin, "optionsbutton");
 		cancelButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {

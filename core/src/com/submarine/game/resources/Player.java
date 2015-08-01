@@ -50,12 +50,15 @@ public class Player {
 	
 	// Bubble particle effect
 	private ParticleEffect bubbles;
+	
+	/*
 	private ParticleEffectPool particlePool;
 	private Array<PooledEffect> effects;
 	private float particleTimer = 999f;
 	private float particleTimeLimit = 0.07f;
-	private Vector2 bubblePosition;
 	
+	private Vector2 bubblePosition;
+	*/
 	public Player(World world, Vector2 spawnpoint, Play play) {
 		this.play = play;
 		
@@ -91,9 +94,9 @@ public class Player {
 		bubbles.load(Gdx.files.internal("effects/bubbles.p"), Gdx.files.internal("effects"));
 		bubbles.start();
 		
-		particlePool = new ParticleEffectPool(bubbles, 0, 50); // Pool size 50 is enough for now
-		effects = new Array<PooledEffect>();
-		bubblePosition = new Vector2();
+		float[] color = { play.getCurrentThemeColor().r, play.getCurrentThemeColor().g, play.getCurrentThemeColor().b };
+		bubbles.getEmitters().get(0).getTint().setColors(color);
+
 	}
 
 	public void render(SpriteBatch sb, float delta) {
@@ -114,13 +117,7 @@ public class Player {
 			sprite.draw(sb);
 		}
 		
-		for(PooledEffect effect : effects) {
-			effect.draw(sb, delta);
-			if(effect.isComplete()) {
-				effects.removeValue(effect, true);
-				effect.free();
-			}
-		}
+		bubbles.draw(sb, delta);
 		sb.end();
 		//Gdx.app.log("pool stats", "active: " + effects.size + " | free: " + particlePool.getFree() + "/" + particlePool.max + " | record: " + particlePool.peak);
 	}
@@ -140,13 +137,7 @@ public class Player {
 		if(up) { movement.y += speed; } 
 		if(down) { movement.y -= speed; }
 		
-		if(left || right || up || down) {	//If moving some where (moving key is down) add bubbles
-			if(sprite.isFlipX()) { // going right
-				addBubbles(false);
-			} else { //going left
-				addBubbles(true);
-			}
-		}
+		updateBubbles();
 		
 		movement.clamp(-speed, speed);	//Clamp movement to stay in range -speed to speed
 		body.applyForceToCenter(movement, true); // Apply movement
@@ -167,21 +158,18 @@ public class Player {
 	}
 	
 	// param is true if turned going to left
-	private void addBubbles(boolean movingLeft) {
-		if(movingLeft) {
-			bubblePosition.set(body.getPosition().x, body.getPosition().y + sprite.getHeight() / 2);
+	private void updateBubbles() {
+		if(left || right || up || down) {	//If moving some where (moving key is down) add bubbles	
+			bubbles.getEmitters().get(0).setContinuous(true);
+			if(sprite.isFlipX()) { // going right
+				bubbles.setPosition(body.getPosition().x + sprite.getWidth(), body.getPosition().y + sprite.getHeight() / 2);
+			} else { //going left
+				bubbles.setPosition(body.getPosition().x, body.getPosition().y + sprite.getHeight() / 2);
+			}
 		} else {
-			bubblePosition.set(body.getPosition().x + sprite.getWidth(), body.getPosition().y + sprite.getHeight() / 2);
+			bubbles.getEmitters().get(0).setContinuous(false); //stop bubbles
 		}
-		particleTimer += Gdx.graphics.getDeltaTime();
-		if(particleTimer >= particleTimeLimit) {
-			PooledEffect effect = particlePool.obtain();
-			effect.setPosition(bubblePosition.x, bubblePosition.y);
-			float[] color = { play.getCurrentThemeColor().r, play.getCurrentThemeColor().g, play.getCurrentThemeColor().b };
-			effect.getEmitters().get(0).getTint().setColors(color);
-			effects.add(effect);
-			particleTimer = 0;
-		}
+	
 	}
 
 	// param is true if turned to left
@@ -226,9 +214,6 @@ public class Player {
 		sprite.getTexture().dispose();
 		takeDamageAnimation.getAnimatedSprite().getTexture().dispose();
 		bubbles.dispose();
-		particlePool.freeAll(effects);
-		particlePool.clear();
-		effects.clear();
 	}
 
 	public void setRight(boolean right) {

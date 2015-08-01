@@ -102,114 +102,178 @@ blue_button07
   orig: 49, 49
   offset: 0, 0
   index: -1
-blue_button09
+blue_button11
   rotate: false
   xy: 244, 48
   size: 49, 49
   orig: 49, 49
   offset: 0, 0
   index: -1
-blue_button10
+blue_button12
   rotate: false
   xy: 244, 1
   size: 49, 45
   orig: 49, 45
   offset: 0, 0
   index: -1
-blue_button11
+levelbutton.up
   rotate: false
   xy: 436, 117
   size: 49, 49
+  split: 6, 6, 3, 8
   orig: 49, 49
   offset: 0, 0
   index: -1
-blue_button12
+levelbutton.down
   rotate: false
   xy: 295, 52
   size: 49, 45
+  split: 3, 3, 3, 4
   orig: 49, 45
+  offset: 0, 0
+  index: -1
+circlebutton.down
+  rotate: false
+  xy: 487, 228
+  size: 40, 40
+  split: 0, 0, 0, 0
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+circlebutton.up
+  rotate: false
+  xy: 295, 10
+  size: 40, 40
+  split: 0, 0, 0, 0
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+optionsbutton.up
+  rotate: false
+  xy: 346, 58
+  size: 36, 39
+  orig: 36, 39
   offset: 0, 0
   index: -1
 blue_boxCheckmark
   rotate: false
-  xy: 295, 14
+  xy: 487, 190
   size: 38, 36
   orig: 38, 36
   offset: 0, 0
   index: -1
 blue_boxCross
   rotate: false
-  xy: 346, 61
+  xy: 487, 152
   size: 38, 36
   orig: 38, 36
   offset: 0, 0
   index: -1
-blue_circle
+arrow.left.down
   rotate: false
-  xy: 386, 79
-  size: 36, 36
-  orig: 36, 36
+  xy: 487, 119
+  size: 39, 31
+  split: 0, 0, 0, 0
+  orig: 39, 31
   offset: 0, 0
   index: -1
-checkbox.off
+arrow.left.up
   rotate: false
-  xy: 424, 79
-  size: 36, 36
-  orig: 36, 36
+  xy: 385, 84
+  size: 39, 31
+  split: 0, 0, 0, 0
+  orig: 39, 31
+  offset: 0, 0
+  index: -1
+arrow.right.down
+  rotate: false
+  xy: 426, 84
+  size: 39, 31
+  split: 0, 0, 0, 31
+  orig: 39, 31
+  offset: 0, 0
+  index: -1
+arrow.right.up
+  rotate: false
+  xy: 384, 51
+  size: 39, 31
+  split: 0, 0, 0, 31
+  orig: 39, 31
   offset: 0, 0
   index: -1
 blue_sliderLeft
   rotate: false
-  xy: 386, 46
+  xy: 425, 51
   size: 39, 31
   orig: 39, 31
   offset: 0, 0
   index: -1
+blue_circle
+  rotate: false
+  xy: 467, 79
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
 blue_sliderRight
   rotate: false
-  xy: 427, 46
+  xy: 466, 46
   size: 39, 31
   orig: 39, 31
   offset: 0, 0
   index: -1
 blue_sliderDown
   rotate: false
-  xy: 335, 8
+  xy: 507, 75
   size: 28, 42
   orig: 28, 42
-  offset: 0, 0
-  index: -1
-checkbox.on
-  rotate: false
-  xy: 365, 8
-  size: 36, 36
-  orig: 36, 36
   offset: 0, 0
   index: -1
 blue_sliderUp
   rotate: false
-  xy: 403, 2
+  xy: 507, 31
   size: 28, 42
   orig: 28, 42
   offset: 0, 0
   index: -1
+checkbox.off
+  rotate: false
+  xy: 346, 20
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
+checkbox.on
+  rotate: false
+  xy: 384, 13
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
+optionsbutton.down
+  rotate: false
+  xy: 422, 13
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
 blue_checkmark
   rotate: false
-  xy: 462, 95
+  xy: 460, 24
   size: 21, 20
   orig: 21, 20
   offset: 0, 0
   index: -1
 blue_cross
   rotate: false
-  xy: 433, 26
+  xy: 483, 26
   size: 18, 18
   orig: 18, 18
   offset: 0, 0
   index: -1
 blue_tick
   rotate: false
-  xy: 433, 7
+  xy: 337, 1
   size: 17, 17
   orig: 17, 17
   offset: 0, 0

@@ -2,16 +2,16 @@ Untitled
 - Delay -
 active: false
 - Duration - 
-lowMin: 2000.0
-lowMax: 2000.0
+lowMin: 0.0
+lowMax: 0.0
 - Count - 
-min: 1
+min: 0
 max: 1000
 - Emission - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 61.0
-highMax: 61.0
+highMin: 70.0
+highMax: 70.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -113,7 +113,7 @@ timeline2: 1.0
 attached: false
 continuous: true
 aligned: false
-additive: true
+additive: false
 behind: false
 - Image Path -
 D:\Ohjelmointi\Omat\libGDX\Submarine\android\assets\effects\beam.png

@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
@@ -156,11 +157,11 @@ public class Play implements Screen {
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		game.sb.setProjectionMatrix(game.cam.combined);
-
+		game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
+		game.gameViewport.apply();
 		level.render();
 		
-		rayHandler.setCombinedMatrix(game.cam);
+		rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
 		rayHandler.updateAndRender();
 		
 		//Render bullet trail
@@ -175,9 +176,10 @@ public class Play implements Screen {
 		//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
 	
 		game.sb.setProjectionMatrix(game.hudCam.combined);
+		game.uiViewport.apply();
 		game.sb.begin();
-			font.getData().setScale(1/64f);
-			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), Main.VIRTUAL_WIDTH * 0.5f, Main.VIRTUAL_HEIGHT * 0.5f);
+			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), game.uiViewport.getWorldWidth() * 0.90f, game.uiViewport.getWorldHeight() * 0.95f);
+			Gdx.app.log("", game.uiViewport.getWorldWidth()+" "+game.uiViewport.getWorldHeight());
 		game.sb.end();
 		
 	}
@@ -247,8 +249,8 @@ public class Play implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		game.cam.setToOrtho(false, width / Constants.PPM , height / Constants.PPM);
-		game.cam.update();
+		game.gameViewport.update(width, height, true);
+		game.uiViewport.update(width, height, true);
 	}
 
 	@Override
@@ -288,11 +290,6 @@ public class Play implements Screen {
 		pointLightPool.freeAll(activeLights);
 		pointLightPool.clear();
 		activeLights.clear();
-	}
-
-	public void addBulletToBeRemoved(Bullet bullet) {
-		bulletsToBeRemoved.add(bullet);
-		//System.out.println("Added bullet");
 	}
 
 	public void addPointLight(Vector2 collisionPoint) {

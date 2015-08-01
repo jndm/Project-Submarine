@@ -1,0 +1,25 @@
+{
+	"com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+		"label":	{ "font": font }
+		"levelButtonSmallFont": { "font": levelbuttonsmallfont }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
+		"arrowright": 	 { "up": "arrow.right.up", 	"down": "arrow.right.down"  }
+		"arrowleft": 	 { "up": "arrow.left.up", 	"down": "arrow.left.down"   }
+		"optionsbutton": { "up": "circlebutton.up", "down": "circlebutton.down" }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+		"button": 		{ "up": "button.up", 		"down": "button.down", 		"pressedOffsetY": -2, 	"font": font }
+		"levelbutton": 	{ "up": "levelbutton.up", 	"down": "levelbutton.down", "pressedOffsetY": -2, 	"font": levelbuttonfont }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
+		"default":	{ "background": panel, "titleFont": font }
+	},
+	
+	"com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle": {
+		"default": { "checkboxOff": checkbox.off, "checkboxOn": checkbox.on, "font": font }
+	}
+}

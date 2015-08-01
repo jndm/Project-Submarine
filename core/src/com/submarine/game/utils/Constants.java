@@ -3,7 +3,10 @@ package com.submarine.game.utils;
 import com.badlogic.gdx.graphics.Color;
 
 public class Constants {
-	
+	public static final int VIRTUAL_WIDTH = 480;
+	public static final int VIRTUAL_HEIGHT = 320;
+	public static final float ASPECT_RATIO = (float)VIRTUAL_WIDTH / (float)VIRTUAL_HEIGHT;
+	public static final float STEP = 1 / 60f;
 	public static final float PPM = 32;
 	public static enum Theme {
 		RED, BLUE, GREEN
@@ -12,6 +15,13 @@ public class Constants {
 	public static final Color RED	= new Color( 1f, 0.19f, 0f, 1f);
 	public static final Color GREEN = new Color( 0.49f, 0.78f, 0.31f, 1f);
 	public static final Color WHITE = new Color( 1f, 1f, 1f, 1f);
+	
+	//Skin paths
+	public static final String LEVEL_SELECT_SKIN_PATH = "ui/levelselect_skin.json";
+	public static final String MAIN_MENU_SKIN_PATH = "ui/mainmenu_skin.json";
+	
+	//Font paths
+	public static final String FONT_KENFACTOR_PATH = "fonts/kenvector_future.ttf";
 	
 	//Atlasses
 	public static final String BLUE_UI_ATLAS  = "ui/bluetheme/bluetheme_uipack.pack";
