@@ -2,6 +2,7 @@ package com.submarine.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
+import com.submarine.game.resources.Level;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.Utils;
 
@@ -205,18 +207,20 @@ public class LevelSelection implements Screen {
 		
 		Table levelButtonTable = new Table();
 		for(int i = startingLevel; i < startingLevel + showMaxLevels; i++) {
+			final Level level = game.saveManager.loadDataValue("level"+i, Level.class);	//Load levelprogress from json
+			
 			TextButton button = new TextButton(i+"", skin, "levelbutton");
 			button.row();
-			button.add(new Label("PB: 00:00:00", skin, "levelButtonSmallFont")).center();
+			button.add(new Label("PB: "+level.getPb(), skin, "levelButtonSmallFont")).center();
 			
 			button.addListener(new ChangeListener() {
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
-					game.setScreen(new Play(game));
+					game.setScreen(new Play(game, level));
 				}
 			});
 			
-			if(i > levelsPassed + 1) {		//Set locked level buttons disabled
+			if(!level.getAvailable()) {		//Set locked level buttons disabled
 				button.setDisabled(true);
 			}
 			

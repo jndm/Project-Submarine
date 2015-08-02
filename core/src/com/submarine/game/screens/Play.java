@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
 import com.submarine.game.resources.Bullet;
+import com.submarine.game.resources.GameWorld;
 import com.submarine.game.resources.Level;
 import com.submarine.game.resources.Player;
 import com.submarine.game.utils.BulletPool;
@@ -35,6 +36,7 @@ public class Play implements Screen {
 	//Common stuff
 	private Main game;
 	private World world;
+	private GameWorld gameWorld;
 	private Level level;
 	private Player player;
 	private float timeElapsed = 0;
@@ -53,8 +55,9 @@ public class Play implements Screen {
 	private PointLightPool pointLightPool;
 	private Array<PointLight> activeLights;	
 	
-	public Play(Main game) {
+	public Play(Main game, Level level) {
 		this.game = game;
+		this.level = level;
 	}
 	
 	@Override
@@ -67,12 +70,12 @@ public class Play implements Screen {
 		
 		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
 		try {
-			level = new Level(this, game, world);
+			gameWorld = new GameWorld(this, game, world, level);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		
-		player = new Player(world, level.getSpawnpoint(), this); //Create player
+		player = new Player(world, gameWorld.getSpawnpoint(), this); //Create player
 		bulletPool = new BulletPool(world, currentThemeColor);
 		bulletsToBeRemoved = new Array<Bullet>();
 		activeBullets = new Array<Bullet>();
@@ -159,7 +162,7 @@ public class Play implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
 		game.gameViewport.apply();
-		level.render();
+		gameWorld.render();
 		
 		rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
 		rayHandler.updateAndRender();
@@ -273,7 +276,7 @@ public class Play implements Screen {
 	@Override
 	public void dispose() {
 		world.dispose();
-		level.dispose();
+		gameWorld.dispose();
 		player.dispose();
 		rayHandler.dispose();
 		

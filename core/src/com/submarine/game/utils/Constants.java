@@ -16,6 +16,9 @@ public class Constants {
 	public static final Color GREEN = new Color( 0.49f, 0.78f, 0.31f, 1f);
 	public static final Color WHITE = new Color( 1f, 1f, 1f, 1f);
 	
+	//Level data
+	public static final int MAXLEVELS = 60;
+	
 	//Skin paths
 	public static final String LEVEL_SELECT_SKIN_PATH = "ui/levelselect_skin.json";
 	public static final String MAIN_MENU_SKIN_PATH = "ui/mainmenu_skin.json";

@@ -7,12 +7,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.submarine.game.resources.Level;
 import com.submarine.game.screens.Mainmenu;
-import com.submarine.game.screens.Play;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.Constants.Theme;
+import com.submarine.game.utils.SaveManager;
 
 public class Main extends Game {
 	
@@ -22,6 +21,7 @@ public class Main extends Game {
 	public OrthographicCamera hudCam;
 	public ExtendViewport gameViewport;
 	public ExtendViewport uiViewport;
+	public SaveManager saveManager;
 	
 	public AssetManager assetManager;
 	
@@ -40,13 +40,31 @@ public class Main extends Game {
 		hudCam = new OrthographicCamera();
 		uiViewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), hudCam);
 		
+		saveManager = new SaveManager();
+		
+		if(saveManager.getAllData().size == 0) {	 // if first time launching the game
+			generateLevelData();
+		}
+		
 		theme = Constants.Theme.BLUE;
 		
 		this.setScreen(new Mainmenu(this));
 		
 	}
-	
-	 public void dispose() {
+
+	private void generateLevelData() {
+		for(int i=0; i < Constants.MAXLEVELS; i++) {
+			Level level = null;
+			if(i < 11) {
+				level = new Level("level"+(i+1), "00:00:00", true, false);	//set first level available
+			} else {
+				level = new Level("level"+(i+1), "00:00:00", false, false);
+			}
+			saveManager.saveDataValue("level"+(i+1), level);
+		}
+	}
+
+	public void dispose() {
 		sb.dispose();
 		shapeRenderer.dispose();
         assetManager.dispose();
