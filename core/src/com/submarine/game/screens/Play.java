@@ -26,6 +26,7 @@ import com.submarine.game.resources.Bullet;
 import com.submarine.game.resources.GameWorld;
 import com.submarine.game.resources.Level;
 import com.submarine.game.resources.Player;
+import com.submarine.game.ui.Hud;
 import com.submarine.game.utils.BulletPool;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
@@ -33,16 +34,10 @@ import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
 import com.submarine.game.utils.Utils;
 
-public class Play implements Screen {
-	
-	//Hud
-	private Stage stage;
-	private Skin skin;
-	private TextureAtlas atlas;
-	private Label timerLabel;
-	
+public class Play implements Screen {	
 	//Common stuff
 	private Main game;
+	private Hud hud;
 	private World world;
 	private GameWorld gameWorld;
 	private Level level;
@@ -71,32 +66,8 @@ public class Play implements Screen {
 	public void show() {
 		checkThemeColor();
 		
-		// HUD
-		game.assetManager.load(Constants.BLUE_UI_ATLAS, TextureAtlas.class);
-		game.assetManager.finishLoading();
+		hud = new Hud(game);
 		
-		atlas = game.assetManager.get(Constants.BLUE_UI_ATLAS);
-		
-		stage = new Stage(game.uiViewport, game.sb);
-		
-		skin = new Skin();
-		skin.add("font", Utils.createFont(Constants.FONT_KENFACTOR_PATH, 20));
-		skin.addRegions(atlas);
-		skin.load(Gdx.files.internal(Constants.HUD_SKIN_PATH));
-		
-		Table mastertable = new Table();
-		mastertable = new Table(skin);
-		mastertable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
-		
-		timerLabel = new Label(gameRunningTime+"", skin, "label");
-		mastertable.add(timerLabel);
-		mastertable.row();
-		mastertable.debug();
-		
-		stage.addActor(mastertable);
-		// END OF HUD 
-		
-		// CREATE OTHER
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
 		
@@ -212,30 +183,25 @@ public class Play implements Screen {
 	
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.uiViewport.apply();
+		
+		hud.render();
+		
 		game.sb.begin();
 			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), game.uiViewport.getWorldWidth() * 0.90f, game.uiViewport.getWorldHeight() * 0.95f);
 			Gdx.app.log("", game.uiViewport.getWorldWidth()+" "+game.uiViewport.getWorldHeight());
 		game.sb.end();
 		
-		stage.act();
-		stage.draw();
-		
 	}
 
 	private void update(float delta) {
-		gameRunningTime += delta;
-		
+		gameRunningTime += delta;	
 		world.step(1/60f, 8, 3);
 		player.move();
 		updateCamera();
 		checkIfBulletsToBeRemoved();
 		updateBulletTrail();
 		fadeOutLights(delta);
-		updateTimer();
-	}
-
-	private void updateTimer() {
-		timerLabel.setText(gameRunningTime+"");
+		hud.update(delta);
 	}
 
 	private void updateBulletTrail() {
