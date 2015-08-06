@@ -24,7 +24,7 @@ public class Level {
 		this.name = name;
 	}
 
-	public Boolean getAvailable() {
+	public Boolean isAvailable() {
 		return available;
 	}
 
@@ -40,7 +40,7 @@ public class Level {
 		this.pb = pb;
 	}
 
-	public Boolean getSecretFound() {
+	public Boolean isSecretFound() {
 		return secretFound;
 	}
 

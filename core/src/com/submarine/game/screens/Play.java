@@ -12,13 +12,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
-import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
 import com.submarine.game.resources.Bullet;
@@ -30,8 +31,15 @@ import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
+import com.submarine.game.utils.Utils;
 
 public class Play implements Screen {
+	
+	//Hud
+	private Stage stage;
+	private Skin skin;
+	private TextureAtlas atlas;
+	private Label timerLabel;
 	
 	//Common stuff
 	private Main game;
@@ -45,7 +53,6 @@ public class Play implements Screen {
 	
 	//Bullet
 	private Array<Bullet> activeBullets; 
-	private Array<Bullet> bulletsToBeRemoved;
 	private BulletPool bulletPool;
 		
 	private BitmapFont font = new BitmapFont();
@@ -62,9 +69,34 @@ public class Play implements Screen {
 	
 	@Override
 	public void show() {
-		
 		checkThemeColor();
 		
+		// HUD
+		game.assetManager.load(Constants.BLUE_UI_ATLAS, TextureAtlas.class);
+		game.assetManager.finishLoading();
+		
+		atlas = game.assetManager.get(Constants.BLUE_UI_ATLAS);
+		
+		stage = new Stage(game.uiViewport, game.sb);
+		
+		skin = new Skin();
+		skin.add("font", Utils.createFont(Constants.FONT_KENFACTOR_PATH, 20));
+		skin.addRegions(atlas);
+		skin.load(Gdx.files.internal(Constants.HUD_SKIN_PATH));
+		
+		Table mastertable = new Table();
+		mastertable = new Table(skin);
+		mastertable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+		
+		timerLabel = new Label(gameRunningTime+"", skin, "label");
+		mastertable.add(timerLabel);
+		mastertable.row();
+		mastertable.debug();
+		
+		stage.addActor(mastertable);
+		// END OF HUD 
+		
+		// CREATE OTHER
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
 		
@@ -77,7 +109,7 @@ public class Play implements Screen {
 		
 		player = new Player(world, gameWorld.getSpawnpoint(), this); //Create player
 		bulletPool = new BulletPool(world, currentThemeColor);
-		bulletsToBeRemoved = new Array<Bullet>();
+		new Array<Bullet>();
 		activeBullets = new Array<Bullet>();
 
 		//Lighting
@@ -185,17 +217,25 @@ public class Play implements Screen {
 			Gdx.app.log("", game.uiViewport.getWorldWidth()+" "+game.uiViewport.getWorldHeight());
 		game.sb.end();
 		
+		stage.act();
+		stage.draw();
+		
 	}
 
 	private void update(float delta) {
+		gameRunningTime += delta;
+		
 		world.step(1/60f, 8, 3);
 		player.move();
 		updateCamera();
 		checkIfBulletsToBeRemoved();
 		updateBulletTrail();
 		fadeOutLights(delta);
-		
-		gameRunningTime += delta;
+		updateTimer();
+	}
+
+	private void updateTimer() {
+		timerLabel.setText(gameRunningTime+"");
 	}
 
 	private void updateBulletTrail() {

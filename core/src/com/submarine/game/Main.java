@@ -55,7 +55,7 @@ public class Main extends Game {
 	private void generateLevelData() {
 		for(int i=0; i < Constants.MAXLEVELS; i++) {
 			Level level = null;
-			if(i < 11) {
+			if(i < 5) {
 				level = new Level("level"+(i+1), "00:00:00", true, false);	//set first level available
 			} else {
 				level = new Level("level"+(i+1), "00:00:00", false, false);

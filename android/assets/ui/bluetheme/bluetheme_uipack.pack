@@ -5,77 +5,77 @@ filter: Nearest,Nearest
 repeat: none
 blue_button00
   rotate: false
-  xy: 1, 219
+  xy: 1, 156
   size: 190, 49
   orig: 190, 49
   offset: 0, 0
   index: -1
 blue_button04
   rotate: false
-  xy: 1, 168
+  xy: 1, 105
   size: 190, 49
   orig: 190, 49
   offset: 0, 0
   index: -1
 blue_button13
   rotate: false
-  xy: 193, 219
+  xy: 193, 156
   size: 190, 49
   orig: 190, 49
   offset: 0, 0
   index: -1
 button.up
   rotate: false
-  xy: 1, 117
+  xy: 1, 54
   size: 190, 49
   orig: 190, 49
   offset: 0, 0
   index: -1
 blue_button01
   rotate: false
-  xy: 193, 172
+  xy: 193, 109
   size: 190, 45
   orig: 190, 45
   offset: 0, 0
   index: -1
 blue_button05
   rotate: false
-  xy: 1, 70
+  xy: 385, 160
   size: 190, 45
   orig: 190, 45
   offset: 0, 0
   index: -1
 button.down
   rotate: false
-  xy: 193, 125
+  xy: 1, 7
   size: 190, 45
   orig: 190, 45
   offset: 0, 0
   index: -1
 dropdownBottom
   rotate: false
-  xy: 1, 44
+  xy: 193, 83
   size: 190, 24
   orig: 190, 24
   offset: 0, 0
   index: -1
 dropdownMid
   rotate: false
-  xy: 193, 99
+  xy: 385, 134
   size: 190, 24
   orig: 190, 24
   offset: 0, 0
   index: -1
 dropdownTop
   rotate: false
-  xy: 1, 18
+  xy: 193, 57
   size: 190, 24
   orig: 190, 24
   offset: 0, 0
   index: -1
 panel
   rotate: false
-  xy: 385, 168
+  xy: 385, 32
   size: 100, 100
   split: 4, 4, 4, 4
   orig: 100, 100
@@ -83,50 +83,58 @@ panel
   index: -1
 blue_button06
   rotate: false
-  xy: 193, 48
+  xy: 577, 156
   size: 49, 49
   orig: 49, 49
   offset: 0, 0
   index: -1
-blue_button08
-  rotate: false
-  xy: 193, 1
-  size: 49, 45
-  orig: 49, 45
-  offset: 0, 0
-  index: -1
 blue_button07
   rotate: false
-  xy: 385, 117
+  xy: 487, 83
   size: 49, 49
   orig: 49, 49
   offset: 0, 0
   index: -1
 blue_button11
   rotate: false
-  xy: 244, 48
+  xy: 628, 156
   size: 49, 49
   orig: 49, 49
   offset: 0, 0
   index: -1
-blue_button12
+levelbutton.disabled
   rotate: false
-  xy: 244, 1
-  size: 49, 45
-  orig: 49, 45
+  xy: 487, 32
+  size: 49, 49
+  split: 4, 4, 4, 8
+  orig: 49, 49
   offset: 0, 0
   index: -1
 levelbutton.up
   rotate: false
-  xy: 436, 117
+  xy: 193, 6
   size: 49, 49
   split: 6, 6, 3, 8
   orig: 49, 49
   offset: 0, 0
   index: -1
+blue_button08
+  rotate: false
+  xy: 244, 10
+  size: 49, 45
+  orig: 49, 45
+  offset: 0, 0
+  index: -1
+blue_button12
+  rotate: false
+  xy: 295, 10
+  size: 49, 45
+  orig: 49, 45
+  offset: 0, 0
+  index: -1
 levelbutton.down
   rotate: false
-  xy: 295, 52
+  xy: 538, 87
   size: 49, 45
   split: 3, 3, 3, 4
   orig: 49, 45
@@ -134,7 +142,7 @@ levelbutton.down
   index: -1
 circlebutton.down
   rotate: false
-  xy: 487, 228
+  xy: 679, 165
   size: 40, 40
   split: 0, 0, 0, 0
   orig: 40, 40
@@ -142,7 +150,7 @@ circlebutton.down
   index: -1
 circlebutton.up
   rotate: false
-  xy: 295, 10
+  xy: 538, 45
   size: 40, 40
   split: 0, 0, 0, 0
   orig: 40, 40
@@ -150,28 +158,35 @@ circlebutton.up
   index: -1
 optionsbutton.up
   rotate: false
-  xy: 346, 58
+  xy: 346, 16
   size: 36, 39
   orig: 36, 39
   offset: 0, 0
   index: -1
-blue_boxCheckmark
+blue_sliderDown
   rotate: false
-  xy: 487, 190
-  size: 38, 36
-  orig: 38, 36
+  xy: 538, 1
+  size: 28, 42
+  orig: 28, 42
   offset: 0, 0
   index: -1
-blue_boxCross
+blue_sliderUp
   rotate: false
-  xy: 487, 152
-  size: 38, 36
-  orig: 38, 36
+  xy: 568, 1
+  size: 28, 42
+  orig: 28, 42
+  offset: 0, 0
+  index: -1
+blue_checkmark
+  rotate: false
+  xy: 577, 134
+  size: 21, 20
+  orig: 21, 20
   offset: 0, 0
   index: -1
 arrow.left.down
   rotate: false
-  xy: 487, 119
+  xy: 600, 123
   size: 39, 31
   split: 0, 0, 0, 0
   orig: 39, 31
@@ -179,15 +194,57 @@ arrow.left.down
   index: -1
 arrow.left.up
   rotate: false
-  xy: 385, 84
+  xy: 641, 123
   size: 39, 31
   split: 0, 0, 0, 0
   orig: 39, 31
   offset: 0, 0
   index: -1
+blue_boxCheckmark
+  rotate: false
+  xy: 682, 127
+  size: 38, 36
+  orig: 38, 36
+  offset: 0, 0
+  index: -1
+blue_boxCross
+  rotate: false
+  xy: 589, 85
+  size: 38, 36
+  orig: 38, 36
+  offset: 0, 0
+  index: -1
+blue_circle
+  rotate: false
+  xy: 629, 85
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
+checkbox.off
+  rotate: false
+  xy: 580, 47
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
+checkbox.on
+  rotate: false
+  xy: 618, 47
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
+optionsbutton.down
+  rotate: false
+  xy: 598, 9
+  size: 36, 36
+  orig: 36, 36
+  offset: 0, 0
+  index: -1
 arrow.right.down
   rotate: false
-  xy: 426, 84
+  xy: 636, 14
   size: 39, 31
   split: 0, 0, 0, 31
   orig: 39, 31
@@ -195,7 +252,7 @@ arrow.right.down
   index: -1
 arrow.right.up
   rotate: false
-  xy: 384, 51
+  xy: 667, 90
   size: 39, 31
   split: 0, 0, 0, 31
   orig: 39, 31
@@ -203,77 +260,28 @@ arrow.right.up
   index: -1
 blue_sliderLeft
   rotate: false
-  xy: 425, 51
+  xy: 667, 57
   size: 39, 31
   orig: 39, 31
-  offset: 0, 0
-  index: -1
-blue_circle
-  rotate: false
-  xy: 467, 79
-  size: 36, 36
-  orig: 36, 36
   offset: 0, 0
   index: -1
 blue_sliderRight
   rotate: false
-  xy: 466, 46
+  xy: 677, 24
   size: 39, 31
   orig: 39, 31
   offset: 0, 0
   index: -1
-blue_sliderDown
-  rotate: false
-  xy: 507, 75
-  size: 28, 42
-  orig: 28, 42
-  offset: 0, 0
-  index: -1
-blue_sliderUp
-  rotate: false
-  xy: 507, 31
-  size: 28, 42
-  orig: 28, 42
-  offset: 0, 0
-  index: -1
-checkbox.off
-  rotate: false
-  xy: 346, 20
-  size: 36, 36
-  orig: 36, 36
-  offset: 0, 0
-  index: -1
-checkbox.on
-  rotate: false
-  xy: 384, 13
-  size: 36, 36
-  orig: 36, 36
-  offset: 0, 0
-  index: -1
-optionsbutton.down
-  rotate: false
-  xy: 422, 13
-  size: 36, 36
-  orig: 36, 36
-  offset: 0, 0
-  index: -1
-blue_checkmark
-  rotate: false
-  xy: 460, 24
-  size: 21, 20
-  orig: 21, 20
-  offset: 0, 0
-  index: -1
 blue_cross
   rotate: false
-  xy: 483, 26
+  xy: 384, 12
   size: 18, 18
   orig: 18, 18
   offset: 0, 0
   index: -1
 blue_tick
   rotate: false
-  xy: 337, 1
+  xy: 404, 13
   size: 17, 17
   orig: 17, 17
   offset: 0, 0

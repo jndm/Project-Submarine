@@ -22,6 +22,7 @@ public class Constants {
 	//Skin paths
 	public static final String LEVEL_SELECT_SKIN_PATH = "ui/levelselect_skin.json";
 	public static final String MAIN_MENU_SKIN_PATH = "ui/mainmenu_skin.json";
+	public static final String HUD_SKIN_PATH = "ui/hud_skin.json";
 	
 	//Font paths
 	public static final String FONT_KENFACTOR_PATH = "fonts/kenvector_future.ttf";

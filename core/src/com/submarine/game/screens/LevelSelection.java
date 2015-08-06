@@ -33,7 +33,7 @@ public class LevelSelection implements Screen {
 	private TextureAtlas atlas;
 	private String currentTheme;
 	private int currentTab = 0;
-	private int levelsPassed = 5;
+	private Array<Table> levelButtonsTabs;
 	
 	private final int showMaxLevels = 15;
 	private final int maxLevels = 60;
@@ -88,21 +88,23 @@ public class LevelSelection implements Screen {
 	
 		addLevelButtonTabsToMasterTable();
 		mastertable.add().fillY().expandY();
-		
+
 		stage.addActor(mastertable);
 		Gdx.input.setInputProcessor(stage);
+		
+		/* THIS IS A STUPID HACK TO DRAW ALL BUTTONS AS VISIBLE FIRST SO THE ACTIONS WILL WORK WITH DISABLED BUTTONS, NO IDEA WHY...*/
+		stage.draw();
+		for(int i=1; i<levelButtonsTabs.size; i++) {
+			levelButtonsTabs.get(i).setVisible(false);
+		}
+		
 	}
 
 	private void addLevelButtonTabsToMasterTable() {
-		final Array<Table> levelButtonsTabs = new Array<Table>();
+		levelButtonsTabs = new Array<Table>();
 		
-		// Create level select tables and set all but first visible (if actor is not visible it doesn't listen actions)
 		for(int i=0; i < maxTabs; i++) {
-			Table t = createLevelSelectButtons((showMaxLevels * i) + 1);			
-			if(i > 0) {
-				t.setVisible(false);
-			}
-			levelButtonsTabs.add(t);		
+			levelButtonsTabs.add(createLevelSelectButtons((showMaxLevels * i) + 1));
 		}
 		
 		// Add level select tables to stack so they become like tabs
@@ -132,27 +134,6 @@ public class LevelSelection implements Screen {
 					currentTab += 1;
 					if(currentTab == maxTabs) {
 						nextTabButton.setDisabled(true);
-					}
-				}
-			}
-		});
-		
-		previousTabButton.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				if(currentTab > 0 && levelButtonsTabs.get(currentTab).getActions().size == 0) { // if not first tab and sliding effect is complete
-					levelButtonsTabs.get(currentTab).addAction(Actions.sequence(
-							Actions.moveBy(stage.getWidth(), 0, 0.5f), 
-							Actions.visible(false)));
-					levelButtonsTabs.get(currentTab - 1).addAction(Actions.sequence(
-							Actions.moveTo(-stage.getWidth(), 0), 
-							Actions.visible(true), 
-							Actions.moveBy(stage.getWidth(), 0, 0.5f)));
-					
-					nextTabButton.setDisabled(false);
-					currentTab -= 1;
-					if(currentTab == 0) {
-						previousTabButton.setDisabled(true);
 					}
 				}
 			}
@@ -220,7 +201,7 @@ public class LevelSelection implements Screen {
 				}
 			});
 			
-			if(!level.getAvailable()) {		//Set locked level buttons disabled
+			if(!level.isAvailable()) {		//Set locked level buttons disabled
 				button.setDisabled(true);
 			}
 			
@@ -233,7 +214,7 @@ public class LevelSelection implements Screen {
 			}
 			
 		}
-		
+
 		return levelButtonTable;
 	}
 
@@ -243,7 +224,7 @@ public class LevelSelection implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.sb.setProjectionMatrix(stage.getCamera().combined);
 		stage.getViewport().apply();
-		
+
 		stage.act();
 		stage.draw();
 	}

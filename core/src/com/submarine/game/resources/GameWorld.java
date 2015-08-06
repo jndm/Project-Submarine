@@ -84,8 +84,8 @@ public class GameWorld {
 	}
 
 	public void render() {
-		mapRenderer.setView(game.cam);
-		mapRenderer.render();
+		//mapRenderer.setView(game.cam);
+		//mapRenderer.render();
 		//box2dRenderer.render(world, game.cam.combined);
 		
 		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
