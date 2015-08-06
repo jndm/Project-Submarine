@@ -67,30 +67,11 @@ public class Hud {
 		int seconds = (int) (gameTime % 60);
 		int milliseconds = (int) ((gameTime % 60 - seconds) * 1000);
 		
-		String mstext = "000";
-		if(milliseconds < 10) {
-			mstext = "00"+milliseconds;
-		} else if(milliseconds < 100) {
-			mstext = "0"+milliseconds;
-		} else {
-			mstext = milliseconds+"";
-		}
+		String mstext = String.format("%03d", milliseconds);
+		String stext = String.format("%02d", seconds);
+		String mintext = String.format("%02d", minutes);
 		
-		String stext = "00";
-		if(seconds > 0 && seconds < 10) {
-			stext = "0"+seconds;
-		} else if(seconds >= 10) {
-			stext = seconds+"";
-		}
-		
-		String mintext = "00";
-		if(minutes > 0 && minutes < 10) {
-			mintext = "0"+minutes;
-		} else if (minutes >= 10) {
-			mintext = minutes+"";
-		}
-		
-		timeString = mintext+":"+stext+":"+mstext;
+		timeString = mintext+":"+stext+"."+mstext;
 		
 		timerLabel.setText(timeString);
 	}
