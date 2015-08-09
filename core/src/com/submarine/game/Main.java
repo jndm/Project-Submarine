@@ -22,6 +22,7 @@ public class Main extends Game {
 	public ExtendViewport gameViewport;
 	public ExtendViewport uiViewport;
 	public SaveManager saveManager;
+	public Options options;
 	
 	public AssetManager assetManager;
 	
@@ -45,6 +46,9 @@ public class Main extends Game {
 		if(saveManager.getAllData().size == 0) {	 // if first time launching the game
 			generateLevelData();
 		}
+		
+		options = new Options();
+		options.setSoundOn(true);
 		
 		theme = Constants.Theme.BLUE;
 		

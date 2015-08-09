@@ -7,6 +7,8 @@ import box2dLight.RayHandler;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -35,6 +37,7 @@ import com.submarine.game.utils.PointLightPool;
 import com.submarine.game.utils.Utils;
 
 public class Play implements Screen {	
+	
 	//Common stuff
 	private Main game;
 	private Hud hud;
@@ -45,6 +48,7 @@ public class Play implements Screen {
 	private float timeElapsed = 0;
 	private float gameRunningTime = 0;
 	private Color currentThemeColor;
+	private boolean paused = false;
 	
 	//Bullet
 	private Array<Bullet> activeBullets; 
@@ -66,7 +70,7 @@ public class Play implements Screen {
 	public void show() {
 		checkThemeColor();
 		
-		hud = new Hud(game);
+		hud = new Hud(game, this);
 		
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
@@ -96,11 +100,13 @@ public class Play implements Screen {
         pointLightPool = new PointLightPool(rayHandler, this);
         activeLights = new Array<PointLight>();
         
-		createInputProcessor();	
+		InputProcessor gameInputProcessor = createInputProcessor();	
+		InputProcessor hudInputProcessor = hud.getStage();
+		Gdx.input.setInputProcessor(new InputMultiplexer(hudInputProcessor, gameInputProcessor));
 	}
 
-	private void createInputProcessor() {
-		Gdx.input.setInputProcessor(new MyInputProcessor(){
+	private MyInputProcessor createInputProcessor() {
+		return new MyInputProcessor(){
 			@Override
 			public boolean keyDown(int keycode) {
 				switch (keycode) {	
@@ -154,41 +160,42 @@ public class Play implements Screen {
 				activeBullets.add(bullet);
 				return true;
 			}
-		});
+		};
 	}
 
 	@Override
 	public void render (float delta) {
-		update(delta);
+		if(!paused) {
+			update(delta);
 
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
-		game.gameViewport.apply();
-		gameWorld.render();
+			Gdx.gl.glClearColor(0, 0, 0, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
+			game.gameViewport.apply();
+			gameWorld.render();
+			
+			rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
+			rayHandler.updateAndRender();
+			
+			//Render bullet trail
+			game.sb.begin();
+			for(Bullet bullet : activeBullets) {
+				bullet.render(game.sb, delta);
+			}
+			game.sb.end();
+			
+			player.render(game.sb, delta);
+			
+			//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
+		} 
 		
-		rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
-		rayHandler.updateAndRender();
-		
-		//Render bullet trail
-		game.sb.begin();
-		for(Bullet bullet : activeBullets) {
-			bullet.render(game.sb, delta);
-		}
-		game.sb.end();
-		
-		player.render(game.sb, delta);
-		
-		//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
-	
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.uiViewport.apply();
 		
 		hud.render();
 		
 		game.sb.begin();
-			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), game.uiViewport.getWorldWidth() * 0.90f, game.uiViewport.getWorldHeight() * 0.95f);
-			Gdx.app.log("", game.uiViewport.getWorldWidth()+" "+game.uiViewport.getWorldHeight());
+			font.draw(game.sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), game.uiViewport.getWorldWidth() * 0.8f, game.uiViewport.getWorldHeight() * 0.95f);
 		game.sb.end();
 		
 	}
@@ -281,6 +288,8 @@ public class Play implements Screen {
 
 	@Override
 	public void dispose() {
+		hud.dispose();
+		
 		world.dispose();
 		gameWorld.dispose();
 		player.dispose();
@@ -325,6 +334,20 @@ public class Play implements Screen {
 	public Color getCurrentThemeColor() {
 		return currentThemeColor;
 	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPaused(boolean paused) {
+		this.paused = paused;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
+	
+	
 	
 	/*STUFF IN CASE EVER NEEDED
 		//OLD BULLET TRAIL RENDERING WITH SHAPERENDERER:

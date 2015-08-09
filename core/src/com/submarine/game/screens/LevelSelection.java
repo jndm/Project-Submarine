@@ -43,8 +43,7 @@ public class LevelSelection implements Screen {
 	private float LEVELBUTTON_HEIGHT;
 	private float ARROW_BUTTON_WIDTH;
     private float ARROW_BUTTON_HEIGHT;
-    private float OPTIONS_BUTTON_WIDTH;
-    private float OPTIONS_BUTTON_HEIGHT; 
+    private float OPTIONS_BUTTON_SIZE;
     
 	private void createConstants() {
 		LEVELBUTTON_WIDTH = stage.getWidth() * 0.165f;  
@@ -53,8 +52,7 @@ public class LevelSelection implements Screen {
 		ARROW_BUTTON_WIDTH  = stage.getWidth() * 0.15f;  
 		ARROW_BUTTON_HEIGHT = stage.getHeight() * 0.13f;
 		
-		OPTIONS_BUTTON_WIDTH = stage.getWidth() * 0.07f;
-		OPTIONS_BUTTON_HEIGHT = stage.getWidth() * 0.07f;
+		OPTIONS_BUTTON_SIZE = stage.getWidth() * 0.07f;
 	}
 	
 	public LevelSelection(Main game, String currentTheme) {
@@ -68,6 +66,11 @@ public class LevelSelection implements Screen {
 	}
 
 	private void applySettings() {
+		if(!game.assetManager.isLoaded(currentTheme)) {
+			game.assetManager.load(Constants.BLUE_UI_ATLAS, TextureAtlas.class);
+			game.assetManager.finishLoading();
+		}
+		
 		atlas = game.assetManager.get(currentTheme);
 		stage = new Stage(game.uiViewport, game.sb);
 		
@@ -83,7 +86,7 @@ public class LevelSelection implements Screen {
 		mastertable = new Table(skin);
 		mastertable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		
-		mastertable.add(new Button(skin, "optionsbutton")).width(OPTIONS_BUTTON_WIDTH).height(OPTIONS_BUTTON_HEIGHT).right().padBottom(stage.getHeight() * 0.01f);
+		mastertable.add(new Button(skin, "optionsbutton")).size(OPTIONS_BUTTON_SIZE).right().padBottom(stage.getHeight() * 0.01f);
 		mastertable.row();
 	
 		addLevelButtonTabsToMasterTable();
