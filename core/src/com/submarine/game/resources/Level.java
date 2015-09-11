@@ -3,7 +3,7 @@ package com.submarine.game.resources;
 public class Level {
 	
 	private String name;
-	private Boolean available;
+	private Boolean passed;
 	private String pb;
 	private Boolean secretFound;
 	
@@ -11,7 +11,7 @@ public class Level {
 	
 	public Level(String name, String pb, Boolean available, Boolean secretFound) {
 		this.pb = pb;
-		this.available = available;
+		this.passed = available;
 		this.name = name;
 		this.secretFound = secretFound;
 	}
@@ -24,12 +24,12 @@ public class Level {
 		this.name = name;
 	}
 
-	public Boolean isAvailable() {
-		return available;
+	public Boolean isPassed() {
+		return passed;
 	}
 
-	public void setAvailable(Boolean available) {
-		this.available = available;
+	public void setPassed(Boolean available) {
+		this.passed = available;
 	}
 
 	public String getPb() {

@@ -1,6 +1,5 @@
 package com.submarine.game.utils;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.submarine.game.resources.Bullet;
 import com.submarine.game.resources.Player;
 import com.submarine.game.screens.Play;
+import com.submarine.game.screens.Play.PlayState;
 
 public class MyContactListener implements ContactListener{
 	
@@ -30,7 +30,7 @@ public class MyContactListener implements ContactListener{
 			Player p = (Player) fa.getUserData();
 			
 			if(fb.getUserData() == Constants.BOX2D_GOAL_USERDATA) {
-				Gdx.app.log("Info", "WINNER");
+				play.setPlayState(PlayState.WIN);
 			} else if(fb.getUserData() == Constants.BOX2D_WALL_USERDATA){		
 				p.setTakeDamage(true);
 				p.removeHp();
@@ -40,7 +40,7 @@ public class MyContactListener implements ContactListener{
 			Player p = (Player) fb.getUserData();
 			
 			if(fa.getUserData() == Constants.BOX2D_GOAL_USERDATA) {
-				Gdx.app.log("Info", "WINNER");
+				play.setPlayState(PlayState.WIN);
 			} else if(fa.getUserData() == Constants.BOX2D_WALL_USERDATA){		
 				p.setTakeDamage(true);
 				p.removeHp();

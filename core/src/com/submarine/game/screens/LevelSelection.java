@@ -66,12 +66,12 @@ public class LevelSelection implements Screen {
 	}
 
 	private void applySettings() {
-		if(!game.assetManager.isLoaded(currentTheme)) {
+		if(!game.assetManager.isLoaded(Constants.BLUE_UI_ATLAS)) {
 			game.assetManager.load(Constants.BLUE_UI_ATLAS, TextureAtlas.class);
 			game.assetManager.finishLoading();
 		}
 		
-		atlas = game.assetManager.get(currentTheme);
+		atlas = game.assetManager.get(Constants.BLUE_UI_ATLAS);
 		stage = new Stage(game.uiViewport, game.sb);
 		
 		createConstants();
@@ -190,12 +190,13 @@ public class LevelSelection implements Screen {
 	private Table createLevelSelectButtons(int startingLevel) {
 		
 		Table levelButtonTable = new Table();
+		Boolean oneExtraLevelOpened = false;
 		for(int i = startingLevel; i < startingLevel + showMaxLevels; i++) {
 			final Level level = game.saveManager.loadDataValue("level"+i, Level.class);	//Load levelprogress from json
 			
 			TextButton button = new TextButton(i+"", skin, "levelbutton");
 			button.row();
-			button.add(new Label("PB: "+level.getPb(), skin, "levelButtonSmallFont")).center();
+			button.add(new Label(""+level.getPb(), skin, "levelButtonSmallFont")).center();
 			
 			button.addListener(new ChangeListener() {
 				@Override
@@ -204,9 +205,13 @@ public class LevelSelection implements Screen {
 				}
 			});
 			
-			if(!level.isAvailable()) {		//Set locked level buttons disabled
-				button.setDisabled(true);
-			}
+			if(!level.isPassed()) {		//Set locked level buttons disabled
+				if(oneExtraLevelOpened) {	// Unlock one more than passed levels
+					button.setDisabled(true);
+				} else {
+					oneExtraLevelOpened = true;
+				}
+			} 
 			
 			levelButtonTable.add(button)
 				.size(LEVELBUTTON_WIDTH, LEVELBUTTON_HEIGHT)
@@ -259,6 +264,6 @@ public class LevelSelection implements Screen {
 		skin.dispose();
 		stage.dispose();
 		atlas.dispose();
-		game.assetManager.unload(currentTheme);
+		game.assetManager.unload(Constants.BLUE_UI_ATLAS);
 	}
 }

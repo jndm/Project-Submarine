@@ -10,7 +10,5 @@ public class Options {
 
 	public void setSoundOn(boolean soundOn) {
 		this.soundOn = soundOn;
-	}
-	
-	
+	}	
 }

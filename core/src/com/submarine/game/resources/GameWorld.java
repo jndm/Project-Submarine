@@ -84,12 +84,12 @@ public class GameWorld {
 	}
 
 	public void render() {
-		//mapRenderer.setView(game.cam);
-		//mapRenderer.render();
+		mapRenderer.setView(game.cam);
+		mapRenderer.render();
 		//box2dRenderer.render(world, game.cam.combined);
 		
 		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
-		game.shapeRenderer.setColor(play.getCurrentThemeColor());
+		game.shapeRenderer.setColor(Constants.BLUE);
 		game.shapeRenderer.begin(ShapeType.Line);
 		for(Shape2D shape : walls) {
 			if(shape instanceof Circle) {

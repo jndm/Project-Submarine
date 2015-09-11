@@ -75,31 +75,17 @@ public class Mainmenu implements Screen {
 
 	@Override
 	public void dispose() {
-		game.assetManager.unload(currentTheme);
+		game.assetManager.unload(Constants.BLUE_UI_ATLAS);
 		skin.dispose();
 		stage.dispose();
 		atlas.dispose();	
 	}
 
-	public void applySettings(boolean themeChanged) {
-		
-		//Dispose last loaded items if they have been changed
-		if(themeChanged && game.assetManager.isLoaded(currentTheme)) {
-			dispose();
-		}
-		
-		if(game.theme == Constants.Theme.RED) {
-			currentTheme = Constants.RED_UI_ATLAS;
-		} else if(game.theme == Constants.Theme.GREEN) {
-			currentTheme = Constants.GREEN_UI_ATLAS;
-		} else if(game.theme == Constants.Theme.BLUE) {
-			currentTheme = Constants.BLUE_UI_ATLAS;
-		}
-		
-		game.assetManager.load(currentTheme, TextureAtlas.class);
+	public void applySettings(boolean themeChanged) {		
+		game.assetManager.load(Constants.BLUE_UI_ATLAS, TextureAtlas.class);
 		game.assetManager.finishLoading();
 		
-		atlas = game.assetManager.get(currentTheme);
+		atlas = game.assetManager.get(Constants.BLUE_UI_ATLAS);
 		
 		stage = new Stage(game.uiViewport, game.sb);
 		

@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.submarine.game.resources.Level;
 import com.submarine.game.screens.Mainmenu;
 import com.submarine.game.utils.Constants;
-import com.submarine.game.utils.Constants.Theme;
 import com.submarine.game.utils.SaveManager;
 
 public class Main extends Game {
@@ -25,8 +24,6 @@ public class Main extends Game {
 	public Options options;
 	
 	public AssetManager assetManager;
-	
-	public Theme theme;
 
 	public void create() {
 		
@@ -50,8 +47,6 @@ public class Main extends Game {
 		options = new Options();
 		options.setSoundOn(true);
 		
-		theme = Constants.Theme.BLUE;
-		
 		this.setScreen(new Mainmenu(this));
 		
 	}
@@ -60,9 +55,9 @@ public class Main extends Game {
 		for(int i=0; i < Constants.MAXLEVELS; i++) {
 			Level level = null;
 			if(i < 5) {
-				level = new Level("level"+(i+1), "00:00:00", true, false);	//set first level available
+				level = new Level("level"+(i+1), "00:00.00", true, false);	//set first level available
 			} else {
-				level = new Level("level"+(i+1), "00:00:00", false, false);
+				level = new Level("level"+(i+1), "00:00.00", false, false);
 			}
 			saveManager.saveDataValue("level"+(i+1), level);
 		}

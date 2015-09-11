@@ -8,17 +8,15 @@ import com.submarine.game.resources.Bullet;
 public class BulletPool extends Pool<Bullet>{
 
 	private World world;
-	private Color currentThemeColor;
 	
-	public BulletPool(World world, Color currentThemeColor) {
+	public BulletPool(World world) {
 		super(20);
 		this.world = world;
-		this.currentThemeColor = currentThemeColor;
 	}
 	
 	@Override
 	protected Bullet newObject() {
-		return new Bullet(world, 0, 0, currentThemeColor);
+		return new Bullet(world, 0, 0);
 	}
 
 }

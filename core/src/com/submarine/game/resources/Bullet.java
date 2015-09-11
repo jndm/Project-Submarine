@@ -33,11 +33,9 @@ public class Bullet implements Poolable{
 	
 	private ParticleEffect beam;
 	
-	private Color currentThemeColor;
 	private boolean bodyRemoved = false;
 	
-	public Bullet(World world, float x, float y, Color currentThemeColor) {
-		this.currentThemeColor = currentThemeColor;
+	public Bullet(World world, float x, float y) {
 		
 		collisionPoints = new Array<Vector2>();
 		shootingPoint = new Vector2();
@@ -57,8 +55,6 @@ public class Bullet implements Poolable{
 		beam = new ParticleEffect();
         beam.load(Gdx.files.internal("effects/beam.p"), Gdx.files.internal("effects"));
 
-        float[] color = { currentThemeColor.r, currentThemeColor.g, currentThemeColor.b };
-		beam.getEmitters().get(0).getTint().setColors(color);
         beam.start();
 	}
 	

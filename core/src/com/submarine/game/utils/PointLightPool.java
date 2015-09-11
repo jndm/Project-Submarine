@@ -3,6 +3,7 @@ package com.submarine.game.utils;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import com.submarine.game.screens.Play;
 
@@ -20,7 +21,6 @@ public class PointLightPool extends Pool<PointLight>{
 	@Override
 	protected PointLight newObject() {
 		PointLight pointlight = new PointLight(rayHandler, 16);
-		pointlight.setColor(play.getCurrentThemeColor());
 		pointlight.setDistance(3);
 		return pointlight;
 	}

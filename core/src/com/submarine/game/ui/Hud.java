@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.submarine.game.Main;
 import com.submarine.game.screens.LevelSelection;
 import com.submarine.game.screens.Play;
+import com.submarine.game.screens.Play.PlayState;
 import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.Utils;
 
@@ -53,8 +54,7 @@ public class Hud {
 		skin.load(Gdx.files.internal(Constants.HUD_SKIN_PATH));
 		
 		// Init root table
-		Table mastertable = new Table();
-		mastertable = new Table(skin);
+		Table mastertable = new Table(skin);
 		mastertable.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 
 		// Add timerlabel to root table
@@ -78,6 +78,11 @@ public class Hud {
 	
 	public void update(float delta) {
 		updateTimer(delta);
+		checkIfPlayerWon();
+	}
+
+	private void checkIfPlayerWon() {
+		
 	}
 
 	private void updateTimer(float delta) {
@@ -112,12 +117,67 @@ public class Hud {
 		return stage;
 	}
 	
+	public void showEndingStatusDialog(boolean win) {
+		Dialog endStatusDialog = new Dialog("", skin, "options");
+		Table contentTable = endStatusDialog.getContentTable();
+		
+		Label text = new Label("You win!", skin, "label");
+		contentTable.add(new Label("Congratulations!\n", skin, "label"));
+		contentTable.row();
+		contentTable.add(new Label("Time: "+timeString, skin, "label")).left();
+		contentTable.row();
+		contentTable.add(new Label("Best time: "+play.getLevel().getPb(), skin, "label")).left();
+		
+		TextButton restartButton = new TextButton("R", skin, "optionsbutton");
+		restartButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new Play(game, play.getLevel()));
+			}
+		});
+		
+		TextButton returnButton = new TextButton("<<", skin, "optionsbutton");
+		returnButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new LevelSelection(game, Constants.BLUE_UI_ATLAS));
+			}
+		});
+		
+		TextButton nextButton = new TextButton(">>", skin, "optionsbutton");
+		nextButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new Play(game, play.getLevel()));
+			}
+		});
+		
+		Table t = new Table();
+		t.add(returnButton)
+		.width(stage.getWidth() * 0.1f)
+		.height(stage.getHeight() * 0.1f);
+	
+		t.add(restartButton)
+			.width(stage.getWidth() * 0.1f)
+			.height(stage.getHeight() * 0.1f)
+			.pad(0, stage.getWidth() * 0.01f, 0, stage.getWidth() * 0.01f);
+	
+		t.add(nextButton)
+			.width(stage.getWidth() * 0.1f)
+			.height(stage.getHeight() * 0.1f);
+		
+		endStatusDialog.row();
+		endStatusDialog.add(t);
+		endStatusDialog.debug();
+		endStatusDialog.show(stage);
+	}
+	
 	private Button createOptionsButton() {
 		Button optionsButton = new Button(skin, "optionsbutton");
 		optionsButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				play.setPaused(true);
+				play.setPlayState(PlayState.PAUSED);
 				new HudOptionsDialog("", skin, "options").show(stage);
 			}
 		});
@@ -140,7 +200,7 @@ public class Hud {
 			resumeButton.addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-					play.setPaused(false);
+					play.setPlayState(PlayState.PLAY);
 					hide();
 				}
 			});
@@ -187,10 +247,8 @@ public class Hud {
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
 					if(soundCheckbox.isChecked()) {
-						System.out.println("Sound on");
 						game.options.setSoundOn(true);
 					} else {
-						System.out.println("Sound off");
 						game.options.setSoundOn(false);
 					}
 				}

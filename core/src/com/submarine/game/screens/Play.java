@@ -14,14 +14,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.submarine.game.Main;
 import com.submarine.game.resources.Bullet;
@@ -34,7 +29,6 @@ import com.submarine.game.utils.Constants;
 import com.submarine.game.utils.MyContactListener;
 import com.submarine.game.utils.MyInputProcessor;
 import com.submarine.game.utils.PointLightPool;
-import com.submarine.game.utils.Utils;
 
 public class Play implements Screen {	
 	
@@ -47,8 +41,12 @@ public class Play implements Screen {
 	private Player player;
 	private float timeElapsed = 0;
 	private float gameRunningTime = 0;
-	private Color currentThemeColor;
-	private boolean paused = false;
+	
+	public enum PlayState {
+		PLAY, PAUSED, WIN, LOSE
+	}
+	
+	private PlayState playState;
 	
 	//Bullet
 	private Array<Bullet> activeBullets; 
@@ -68,25 +66,13 @@ public class Play implements Screen {
 	
 	@Override
 	public void show() {
-		checkThemeColor();
+		playState = PlayState.PLAY;
 		
 		hud = new Hud(game, this);
 		
 		world = new World(new Vector2(0, 0f), true);
 		world.setContactListener(new MyContactListener(this));
 		
-		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
-		try {
-			gameWorld = new GameWorld(this, game, world, level);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
-		player = new Player(world, gameWorld.getSpawnpoint(), this); //Create player
-		bulletPool = new BulletPool(world, currentThemeColor);
-		new Array<Bullet>();
-		activeBullets = new Array<Bullet>();
-
 		//Lighting
         RayHandler.useDiffuseLight(true);
         RayHandler.setGammaCorrection(true);
@@ -99,7 +85,18 @@ public class Play implements Screen {
         
         pointLightPool = new PointLightPool(rayHandler, this);
         activeLights = new Array<PointLight>();
-        
+		
+		//Add level string constant to pass to level when there is more than 1 level (also to Play-class' constructor)
+		try {
+			gameWorld = new GameWorld(this, game, world, level);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		  
+		player = new Player(world, gameWorld.getSpawnpoint(), this, rayHandler); //Create player
+		bulletPool = new BulletPool(world);
+		activeBullets = new Array<Bullet>();
+      
 		InputProcessor gameInputProcessor = createInputProcessor();	
 		InputProcessor hudInputProcessor = hud.getStage();
 		Gdx.input.setInputProcessor(new InputMultiplexer(hudInputProcessor, gameInputProcessor));
@@ -165,30 +162,36 @@ public class Play implements Screen {
 
 	@Override
 	public void render (float delta) {
-		if(!paused) {
-			update(delta);
-
-			Gdx.gl.glClearColor(0, 0, 0, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-			game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
-			game.gameViewport.apply();
-			gameWorld.render();
-			
-			rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
-			rayHandler.updateAndRender();
-			
-			//Render bullet trail
-			game.sb.begin();
-			for(Bullet bullet : activeBullets) {
-				bullet.render(game.sb, delta);
-			}
-			game.sb.end();
-			
-			player.render(game.sb, delta);
-			
-			//Gdx.app.log("pool stats", "active: " + beamParticles.size + " | free: " + beamParticlePool.getFree() + "/" + beamParticlePool.max + " | record: " + beamParticlePool.peak);
-		} 
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		// Draw stuff according to play state
+		switch(playState) {
+			case PLAY:
+				update(delta);
+			case PAUSED:
+			case WIN:
+				game.sb.setProjectionMatrix(game.gameViewport.getCamera().combined);
+				game.gameViewport.apply();
+				gameWorld.render();
+
+				rayHandler.setCombinedMatrix((OrthographicCamera) game.gameViewport.getCamera());
+				rayHandler.updateAndRender();
+				
+				//Render bullet trail
+				game.sb.begin();
+				for(Bullet bullet : activeBullets) {
+					bullet.render(game.sb, delta);
+				}
+				game.sb.end();
+				
+				player.render(game.sb, delta);
+				break;
+			case LOSE:
+				break;
+		}
+		
+		//Always draw hud
 		game.sb.setProjectionMatrix(game.hudCam.combined);
 		game.uiViewport.apply();
 		
@@ -209,6 +212,28 @@ public class Play implements Screen {
 		updateBulletTrail();
 		fadeOutLights(delta);
 		hud.update(delta);
+		checkIfPlayerWon();
+	}
+
+	private void checkIfPlayerWon() {
+		if(playState == PlayState.WIN) {		
+			boolean valueChanged = false;
+			if(level.getPb().equals("00:00.00") || hud.getTimeString().compareTo(level.getPb()) < 0) {
+				level.setPb(hud.getTimeString());
+				valueChanged = true;
+			}
+			
+			if(!level.isPassed()) {
+				level.setPassed(true);
+				valueChanged = true;
+			}
+			
+			if(valueChanged) {
+				game.saveManager.saveDataValue(level.getName(), level);
+			}
+			
+			hud.showEndingStatusDialog(true);
+		}
 	}
 
 	private void updateBulletTrail() {
@@ -225,6 +250,7 @@ public class Play implements Screen {
 				while(i.hasNext()) {
 					PointLight pl = i.next();
 					float newAlpha = pl.getColor().a - 0.01f;
+					System.out.println(pl.getColor().a);
 					pl.setColor(pl.getColor().r, pl.getColor().g, pl.getColor().b, newAlpha);
 					if(newAlpha <= 0) {
 						activeLights.removeValue(pl, false);
@@ -283,7 +309,7 @@ public class Play implements Screen {
 
 	@Override
 	public void hide() {
-		dispose();
+		//dispose();
 	}
 
 	@Override
@@ -313,81 +339,24 @@ public class Play implements Screen {
 	public void addPointLight(Vector2 collisionPoint) {
 		PointLight pl = pointLightPool.obtain();
 		pl.setPosition(collisionPoint);
-		pl.setColor(currentThemeColor);
+		pl.setColor(Constants.BLUE);
 		activeLights.add(pl);
 	}
 
 	public float getGameRunningTime() {
 		return gameRunningTime;
 	}
-	
-	private void checkThemeColor() {
-		if(game.theme == Constants.Theme.RED) {
-			currentThemeColor = Constants.RED;
-		} else if(game.theme == Constants.Theme.GREEN) {
-			currentThemeColor = Constants.GREEN;
-		} else if(game.theme == Constants.Theme.BLUE) {
-			currentThemeColor = Constants.BLUE;
-		}
-	}
-
-	public Color getCurrentThemeColor() {
-		return currentThemeColor;
-	}
-
-	public boolean isPaused() {
-		return paused;
-	}
-
-	public void setPaused(boolean paused) {
-		this.paused = paused;
-	}
 
 	public Level getLevel() {
 		return level;
 	}
-	
-	
-	
-	/*STUFF IN CASE EVER NEEDED
-		//OLD BULLET TRAIL RENDERING WITH SHAPERENDERER:
-		game.shapeRenderer.setProjectionMatrix(game.cam.combined);
-		game.shapeRenderer.setColor(0.41f, 0.78f, 1f, 1f);
-		game.shapeRenderer.begin(ShapeType.Filled);
-		for(Bullet b : activeBullets){
-			Vector2 bulletpos = b.getBody().getPosition();
-			if(b.getCollisionPoints().size == 0) {	// no collision points
-				game.shapeRenderer.rectLine(b.getShootingPoint(), bulletpos, Constants.WAVE_WIDTH);
-			} else {
-				game.shapeRenderer.rectLine(b.getShootingPoint(), b.getCollisionPoints().first(), Constants.WAVE_WIDTH); // 1 or more collision points
-				if(b.getCollisionPoints().size > 1) {	//More than 1 collision points
-					for(int i=0; i<b.getCollisionPoints().size-1; i++) {
-						game.shapeRenderer.rectLine(b.getCollisionPoints().get(i), b.getCollisionPoints().get(i+1), Constants.WAVE_WIDTH);
-					}
-					game.shapeRenderer.rectLine(b.getCollisionPoints().get(b.getCollisionPoints().size - 1), bulletpos, Constants.WAVE_WIDTH);	// always draw last line to bullet position
-				} else {
-					game.shapeRenderer.rectLine(b.getCollisionPoints().first(), bulletpos, Constants.WAVE_WIDTH); // always draw last line to bullet position
-				}
-			}
-		}
-		game.shapeRenderer.end();
-		//ENDOF
 
-		//KEEPS CAMERA INSIDE THE GAMEWORLD:
-		float camx = game.cam.position.x;
-		float camy = game.cam.position.y;
-		float camw = game.cam.viewportWidth;
-		float camh = game.cam.viewportHeight;
-		
-		//Horizontal
-		if(camx - camw/2 <= 0 && camx + camw/2 >= LEVEL_WIDTH) {
-			game.cam.position.x = playerpos.x;
-		}
-		
-		//Vertical
-		if(camy - camh/2 <= 0 && camy + camh/2 >= LEVEL_HEIGHT) {
-			game.cam.position.y = playerpos.y;
-		}
-		//ENDOF
-	*/
+	public PlayState getPlayState() {
+		return playState;
+	}
+
+	public void setPlayState(PlayState playState) {
+		this.playState = playState;
+	}
+	
 }

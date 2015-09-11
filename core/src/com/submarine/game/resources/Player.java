@@ -3,6 +3,8 @@ package com.submarine.game.resources;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -44,6 +46,7 @@ public class Player {
 	private Vector2 movement;
 	private float speed = 10;
 	private float hp = 2;
+	private float pointlightRadius = 3.5f;
 	
 	// Key hold down
 	private boolean right = false, left = false, up = false, down = false;
@@ -51,15 +54,9 @@ public class Player {
 	// Bubble particle effect
 	private ParticleEffect bubbles;
 	
-	/*
-	private ParticleEffectPool particlePool;
-	private Array<PooledEffect> effects;
-	private float particleTimer = 999f;
-	private float particleTimeLimit = 0.07f;
+	private Array<PointLight> playerLight;
 	
-	private Vector2 bubblePosition;
-	*/
-	public Player(World world, Vector2 spawnpoint, Play play) {
+	public Player(World world, Vector2 spawnpoint, Play play, RayHandler rayHandler) {
 		this.play = play;
 		
 		movement = new Vector2(0, 0);
@@ -73,7 +70,6 @@ public class Player {
 		//Create sprite for player
 		sprite = new Box2DSprite(new Texture(Gdx.files.internal("player/submarine.normal.png")));
 		sprite.setSize(sprite.getTexture().getWidth() / Constants.PPM, sprite.getTexture().getHeight() / Constants.PPM);
-		sprite.setColor(play.getCurrentThemeColor());
 			
 		//TEMPORARY SOLUTION * CHANGE TO ASSETMANAGER AT SOME POINT	
 		TextureRegion[] txr = new TextureRegion[]  
@@ -94,20 +90,20 @@ public class Player {
 		bubbles.load(Gdx.files.internal("effects/bubbles.p"), Gdx.files.internal("effects"));
 		bubbles.start();
 		
-		float[] color = { play.getCurrentThemeColor().r, play.getCurrentThemeColor().g, play.getCurrentThemeColor().b };
-		bubbles.getEmitters().get(0).getTint().setColors(color);
-
+		//Create point-light for player
+		playerLight = new Array<PointLight>();
+		for(int i=0; i < 3; i++) {
+	        PointLight p = new PointLight(rayHandler, 20, new Color(1,1,1,1), pointlightRadius, spawnpoint.x, spawnpoint.y);
+	        p.setXray(true);
+	        p.setSoft(false);
+	        playerLight.add(p);
+        }
 	}
 
 	public void render(SpriteBatch sb, float delta) {
 		sb.begin();
 		if(takeDamage) {
 			takeDamageAnimation.update();
-			if(takeDamageAnimation.getAnimation().getKeyFrameIndex(takeDamageAnimation.getTime()) % 2 == 0) { //Tint every other frame with theme color
-				takeDamageAnimation.setColor(play.getCurrentThemeColor());
-			} else {
-				takeDamageAnimation.setColor(Constants.WHITE);
-			}
 			takeDamageAnimation.draw(sb);		
 			if(takeDamageAnimation.isAnimationFinished()) {
 				takeDamage = false;
@@ -155,8 +151,16 @@ public class Player {
 		}
 		sprite.setPosition(body.getPosition().x, body.getPosition().y);
 		takeDamageAnimation.setPosition(body.getPosition().x, body.getPosition().y);
+		
+		movePointLight();
 	}
 	
+	private void movePointLight() {
+		for(PointLight pl : playerLight) {
+			pl.setPosition(body.getWorldCenter().x, body.getWorldCenter().y);
+		}
+	}
+
 	// param is true if turned going to left
 	private void updateBubbles() {
 		if(left || right || up || down) {	//If moving some where (moving key is down) add bubbles	
